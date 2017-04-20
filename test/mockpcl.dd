@@ -1,0 +1,74 @@
+#!/usr/bin/env bash
+## mock partclone that records arguments and allows control of output
+## ie for mockpcl.dd:
+##  -s -> .latest.s.mockpcl.dd.txt
+##  -c -> .latest.c.mockpcl.dd.txt
+##  control with setting complete in .control.mockpcl.dd
+
+set -eu
+
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+ME=`basename "$0"`
+source=""
+argc=""
+while getopts 's:c' flag; do
+  case ${flag} in
+    s) source=${OPTARG} ;;
+    c) argc="set" ;;
+  esac
+done
+
+complete="0.00"
+rate="9.99GB/min"
+
+function echo_output_head {
+  echo "Partclone v0.2.89-mock http://partclone.org" >&2
+  echo "Starting to clone/restore (/dev/sda5) to (-) with dd mode" >&2
+  echo "Calculating bitmap... Please wait... done!" >&2
+  echo "File system:  raw" >&2
+  echo "Device size:   32.2 GB = 62914560 Blocks" >&2
+  echo "Space in use:  32.2 GB = 62914560 Blocks" >&2
+  echo "Free Space:     0 Byte = 0 Blocks" >&2
+  echo "Block size:   512 Byte" >&2
+}
+function echo_output_tail {
+  echo "Elapsed: 00:00:12, Remaining: 00:03:02, Completed:   $complete%,   $rate," >&2
+  echo "current block:    3878912, total block:   62914560, Complete:   $complete" >&2
+}
+function echo_final {
+  echo "Total Time: 00:00:58, Ave. Rate:   33.3GB/min, 100.00% completed!" >&2
+  echo "Syncing... OK!" >&2
+}
+function move_cursor_up_2 { echo -en "\e[2A" >&2; }
+
+## mimick partclone output
+echo_output_head
+echo_output_tail
+move_cursor_up_2
+
+complete="25.12"
+rate="9.88GB/min"
+sleep 1
+echo_output_tail
+move_cursor_up_2
+
+complete="50.24"
+rate="9.77GB/min"
+sleep 1
+echo_output_tail
+move_cursor_up_2
+
+complete="75.36"
+rate="9.66GB/min"
+sleep 1
+echo_output_tail
+move_cursor_up_2
+
+complete="100.00"
+rate="9.55GB/min"
+sleep 1
+
+# control -> complete="100.00"
+echo_output_tail
+echo -n "tion-$source-data" # mock output part 2/2
+echo_final
