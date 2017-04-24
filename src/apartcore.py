@@ -14,12 +14,14 @@ class MessageListener:
         self.message_predicate = message_predicate
         self.remove_fn = None
 
-    def listen_to(self, core: 'ApartCore'):
+    def listen_to(self, core: 'ApartCore') -> 'MessageListener':
         self.remove_fn = core.register(self)
+        return self
 
-    def stop_listening(self):
+    def stop_listening(self) -> 'MessageListener':
         if self.remove_fn is not None:
             self.remove_fn()
+        return self
 
 
 class ApartCore(Thread):
@@ -63,6 +65,7 @@ class ApartCore(Thread):
     def send(self, message: str):
         if not self.zmq_context.closed:
             self.socket.send_string(message)
+            print('apart-core <-\n----\n{}\n----'.format(message))
 
     def register(self, message_listener: MessageListener) -> Callable[[], None]:
         """:return: remove function"""

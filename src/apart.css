@@ -1,0 +1,32 @@
+.new-clone-options {
+  margin: 6px;
+}
+.new-clone-options .dim-label {
+  margin: 6px 6px 6px 0;
+}
+.new-clone-options filechooserbutton {
+  min-width: 300px;
+}
+.new-clone-buttons button:last-child {
+  margin-left: 6px;
+}
+
+.part-info-key, .part-info-val {
+  padding-top: 5px;
+}
+.part-info-key {
+  margin-right: 1ex;
+}
+.part-info-val {
+  margin-right: 2ex;
+}
+.clone-part-info {
+  padding: 6px;
+}
+
+.jobs {
+  padding: 6px;
+}
+.job-title {
+  font-size: 90%;
+}

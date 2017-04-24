@@ -5,9 +5,9 @@ echo '{
    "blockdevices": [
       {"name": "sda", "size": "750156374016", "fstype": null, "label": null, "mountpoint": null,
          "children": [
-            {"name": "sda1", "size": "104857600", "fstype": "ntfs", "label": "Win Reserved", "mountpoint": null},
-            {"name": "sda2", "size": "536766054400", "fstype": "ntfs", "label": "SSD", "mountpoint": null},
-            {"name": "sda3", "size": "181070200832", "fstype": "ext4", "label": "Arch", "mountpoint": "/"},
+            {"name": "sda1", "size": "104857600", "fstype": "ntfs", "label": "win reserved", "mountpoint": null},
+            {"name": "sda2", "size": "536766054400", "fstype": "ntfs", "label": "ssd", "mountpoint": null},
+            {"name": "sda3", "size": "181070200832", "fstype": "ext4", "label": "arch", "mountpoint": "/"},
             {"name": "sda4", "size": "1024", "fstype": null, "label": null, "mountpoint": null},
             {"name": "sda5", "size": "32212254720", "fstype": null, "label": null, "mountpoint": null}
          ]

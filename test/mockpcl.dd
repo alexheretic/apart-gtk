@@ -21,10 +21,13 @@ done
 complete="0.00"
 rate="9.99GB/min"
 
-function echo_output_head {
+function echo_output_head_1 {
   echo "Partclone v0.2.89-mock http://partclone.org" >&2
   echo "Starting to clone/restore (/dev/sda5) to (-) with dd mode" >&2
-  echo "Calculating bitmap... Please wait... done!" >&2
+  echo -n "Calculating bitmap... Please wait... " >&2
+}
+function echo_output_head_2 {
+  echo "done!" >&2
   echo "File system:  raw" >&2
   echo "Device size:   32.2 GB = 62914560 Blocks" >&2
   echo "Space in use:  32.2 GB = 62914560 Blocks" >&2
@@ -42,31 +45,33 @@ function echo_final {
 function move_cursor_up_2 { echo -en "\e[2A" >&2; }
 
 ## mimick partclone output
-echo_output_head
+echo_output_head_1
+sleep 1
+echo_output_head_2
 echo_output_tail
 move_cursor_up_2
 
 complete="25.12"
 rate="9.88GB/min"
-sleep 1
+sleep 2
 echo_output_tail
 move_cursor_up_2
 
 complete="50.24"
 rate="9.77GB/min"
-sleep 1
+sleep 2
 echo_output_tail
 move_cursor_up_2
 
 complete="75.36"
 rate="9.66GB/min"
-sleep 1
+sleep 2
 echo_output_tail
 move_cursor_up_2
 
 complete="100.00"
 rate="9.55GB/min"
-sleep 1
+sleep 2
 
 # control -> complete="100.00"
 echo_output_tail
