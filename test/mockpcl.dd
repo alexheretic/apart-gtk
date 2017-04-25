@@ -20,6 +20,7 @@ done
 
 complete="0.00"
 rate="9.99GB/min"
+remaining="00:00:08"
 
 function echo_output_head_1 {
   echo "Partclone v0.2.89-mock http://partclone.org" >&2
@@ -35,7 +36,7 @@ function echo_output_head_2 {
   echo "Block size:   512 Byte" >&2
 }
 function echo_output_tail {
-  echo "Elapsed: 00:00:12, Remaining: 00:03:02, Completed:   $complete%,   $rate," >&2
+  echo "Elapsed: 00:00:12, Remaining: $remaining, Completed:   $complete%,   $rate," >&2
   echo "current block:    3878912, total block:   62914560, Complete:   $complete" >&2
 }
 function echo_final {
@@ -51,27 +52,35 @@ echo_output_head_2
 echo_output_tail
 move_cursor_up_2
 
+sleep 1
 complete="25.12"
 rate="9.88GB/min"
-sleep 2
+remaining="00:00:03"
+
 echo_output_tail
 move_cursor_up_2
 
+sleep 1
 complete="50.24"
 rate="9.77GB/min"
-sleep 2
+remaining="00:00:02"
+
 echo_output_tail
 move_cursor_up_2
 
+sleep 1
 complete="75.36"
 rate="9.66GB/min"
-sleep 2
+remaining="00:00:01"
+
 echo_output_tail
 move_cursor_up_2
 
+sleep 1
 complete="100.00"
 rate="9.55GB/min"
-sleep 2
+remaining="00:00:00"
+
 
 # control -> complete="100.00"
 echo_output_tail

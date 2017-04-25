@@ -3,7 +3,7 @@ import os
 import sys
 import gi
 from apartcore import ApartCore, MessageListener
-from body import CloneBody
+from main import CloneBody
 from typing import *
 gi.require_version('Gtk', '3.0')
 from gi.repository import GLib, Gio, Gtk, Gdk

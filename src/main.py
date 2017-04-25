@@ -1,7 +1,7 @@
 import gi
 from apartcore import ApartCore
 from typing import *
-from cloneentry import NewCloneEntry
+from cloneentry import CloneToImageEntry
 from partinfo import PartitionInfo
 from progress import ProgressView
 
@@ -53,7 +53,7 @@ class MainView(Gtk.Stack):
         Gtk.Stack.__init__(self)
         self.set_transition_type(Gtk.StackTransitionType.NONE)
         self.set_transition_duration(200)
-        self.new_clone = NewCloneEntry(self, core)
+        self.new_clone = CloneToImageEntry(self, core)
         self.add_named(self.new_clone, name='new-clone')
         self.progress = ProgressView(core)
         self.add_named(self.progress, name='progress')

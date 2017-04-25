@@ -24,9 +24,21 @@
   padding: 6px;
 }
 
-.jobs {
+.progress-view {
+  background: @base_color;
+}
+.section-title {
+  padding: 6px 6px 0;
+  font-size: 100%;
+  font-weight: bold;
+}
+.finished-jobs, .jobs {
   padding: 6px;
 }
-.job-title {
-  font-size: 90%;
+.job-stats {
+  margin-top: -3px;
+}
+.finished-job-title > image {
+  padding-right: 6px;
+  margin-bottom: 2px;
 }

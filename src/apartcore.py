@@ -9,10 +9,13 @@ from typing import *
 
 class MessageListener:
     def __init__(self, on_message: Callable[[Dict], None],
-                 message_predicate: Callable[[Dict], bool] = lambda m: True):
+                 message_predicate: Callable[[Dict], bool] = lambda m: True,
+                 listen_to: 'ApartCore' = None):
         self.on_message = on_message
         self.message_predicate = message_predicate
         self.remove_fn = None
+        if listen_to:
+            self.listen_to(listen_to)
 
     def listen_to(self, core: 'ApartCore') -> 'MessageListener':
         self.remove_fn = core.register(self)

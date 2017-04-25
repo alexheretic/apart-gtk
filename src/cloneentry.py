@@ -6,7 +6,7 @@ gi.require_version('Gtk', '3.0')
 from gi.repository import GLib, Gio, Gtk, Gdk
 
 
-class NewCloneEntry(Gtk.Box):
+class CloneToImageEntry(Gtk.Box):
     def __init__(self, main_view: 'MainView', core: ApartCore):
         Gtk.Box.__init__(self, orientation=Gtk.Orientation.VERTICAL, expand=True)
         self.main_view = main_view
@@ -56,6 +56,13 @@ class NewCloneEntry(Gtk.Box):
 
         self.last_part_info = part_info
         self.update_title()
+
+        if part_info.is_mounted():
+            self.start_btn.set_sensitive(False)
+            self.start_btn.set_tooltip_text('Partition is currently mounted')
+        else:
+            self.start_btn.set_sensitive(True)
+            self.start_btn.set_tooltip_text(None)
 
     def update_title(self):
         if not self.last_part_info:
