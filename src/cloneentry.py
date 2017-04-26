@@ -1,9 +1,10 @@
-import gi
+import re
+
 from apartcore import ApartCore
 from partinfo import PartitionInfo
+from gi.repository import Gtk
 
-gi.require_version('Gtk', '3.0')
-from gi.repository import GLib, Gio, Gtk, Gdk
+invalid_name_re = re.compile(r'[^A-Za-z0-9 _-]')
 
 
 class CloneToImageEntry(Gtk.Box):
@@ -18,6 +19,7 @@ class CloneToImageEntry(Gtk.Box):
         self.name_label = Gtk.Label("Backup name", xalign=1.0)
         self.name_label.get_style_context().add_class('dim-label')
         self.name_entry = Gtk.Entry()
+        self.name_entry.connect('changed', self.on_name_change)
 
         self.dir_label = Gtk.Label("Backup directory", xalign=1.0)
         self.dir_label.get_style_context().add_class('dim-label')
@@ -86,3 +88,11 @@ class CloneToImageEntry(Gtk.Box):
     def backup_name(self):
         return self.name_entry.get_text() or \
                self.last_part_info and (self.last_part_info.label() or self.last_part_info.name())
+
+    def on_name_change(self, entry):
+        entry.set_text(re.sub(invalid_name_re, '', entry.get_text()))
+        if len(entry.get_text()) > 0 and self.last_part_info and not self.last_part_info.is_mounted():
+            self.start_btn.set_sensitive(True)
+        else:
+            self.start_btn.set_sensitive(False)
+

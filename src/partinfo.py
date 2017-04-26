@@ -1,19 +1,16 @@
-import gi
-from apartcore import ApartCore, MessageListener
 from typing import *
+from gi.repository import Gtk
 import humanize
-
-gi.require_version('Gtk', '3.0')
-from gi.repository import GLib, Gio, Gtk, Gdk, Pango
+from apartcore import ApartCore
 
 
-def key_and_val(key: str, val: str, **kwargs) -> Gtk.Box:
-    box = Gtk.Box(**kwargs)
-    key_label = Gtk.Label(key)
+def key_and_val(key: str, val: str, visible=False) -> Gtk.Box:
+    box = Gtk.Box(visible=visible)
+    key_label = Gtk.Label(key, visible=visible)
     key_label.get_style_context().add_class('part-info-key')
     key_label.get_style_context().add_class('dim-label')
     box.add(key_label)
-    val_label = Gtk.Label(val)
+    val_label = Gtk.Label(val, visible=visible)
     val_label.get_style_context().add_class('part-info-val')
     box.add(val_label)
     box.key_label = key_label

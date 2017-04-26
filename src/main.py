@@ -1,12 +1,9 @@
-import gi
 from apartcore import ApartCore
 from typing import *
 from cloneentry import CloneToImageEntry
 from partinfo import PartitionInfo
-from progress import ProgressView
-
-gi.require_version('Gtk', '3.0')
-from gi.repository import GLib, Gio, Gtk, Gdk
+from progress import ProgressAndHistoryView
+from gi.repository import Gtk
 
 
 class CloneBody(Gtk.Box):
@@ -55,7 +52,7 @@ class MainView(Gtk.Stack):
         self.set_transition_duration(200)
         self.new_clone = CloneToImageEntry(self, core)
         self.add_named(self.new_clone, name='new-clone')
-        self.progress = ProgressView(core)
+        self.progress = ProgressAndHistoryView(core)
         self.add_named(self.progress, name='progress')
 
     def show(self, name, fade: bool):

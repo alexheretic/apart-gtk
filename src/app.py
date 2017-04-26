@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
+import gi
+gi.require_version('Gtk', '3.0')  # require version before other importing
 import os
 import sys
-import gi
 from apartcore import ApartCore, MessageListener
 from main import CloneBody
 from typing import *
-gi.require_version('Gtk', '3.0')
 from gi.repository import GLib, Gio, Gtk, Gdk
 
 
@@ -54,6 +54,7 @@ class Window(Gtk.Window):
     def on_delete(self, arg1=None, arg2=None):
         self.status_listener.stop_listening()
         self.remove(self.clone_body)
+        self.clone_body.destroy()
         self.add(self.loading_body)
         self.core.kill()
 

@@ -1,3 +1,4 @@
+from datetime import datetime, timezone
 import uuid
 import yaml
 import subprocess
@@ -27,6 +28,37 @@ class MessageListener:
         return self
 
 
+def default_datetime_to_utc(message):
+    """Recursively add UTC as tz when missing, bug in pyyaml as all yaml datetimes here have 'Z' endings"""
+    def handle(val, setter: Callable):
+        if type(val) is datetime:
+            setter(val.replace(tzinfo=val.tzinfo or timezone.utc))
+        elif isinstance(val, Dict):
+            do_in_dict(val)
+        elif isinstance(val, List):
+            do_in_list(val)
+
+    def do_in_list(values: List):
+        for idx, val in enumerate(values):
+            def overwrite(v):
+                values[idx] = v
+            handle(val, overwrite)
+
+    def do_in_dict(values: Dict):
+        for key, val in values.items():
+            def overwrite(v):
+                values[key] = v
+            handle(val, overwrite)
+
+    if isinstance(message, Dict):
+        do_in_dict(message)
+    elif isinstance(message, List):
+        do_in_list(message)
+    else:
+        raise Exception('Unknown type: ' + type(message))
+    return message
+
+
 class ApartCore(Thread):
     def __init__(self, listeners: List[MessageListener] = None):
         """Starts an apart-core command and starts listening for zmq messages on this new thread"""
@@ -53,6 +85,7 @@ class ApartCore(Thread):
     def run(self):
         while self.process.returncode is None:
             msg = yaml.load(self.socket.recv_string())
+            default_datetime_to_utc(msg)
             for listener in self.listeners:
                 if listener.message_predicate(msg):
                     listener.on_message(msg)

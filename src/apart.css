@@ -38,7 +38,17 @@
 .job-stats {
   margin-top: -3px;
 }
+.finished-job-stats {
+  margin-top: -3px;
+  margin-left: 6px;
+}
 .finished-job-title > image {
   padding-right: 6px;
   margin-bottom: 2px;
+}
+.job-buttons button {
+  margin-right: 6px;
+}
+.job-buttons button:last-child {
+  margin-right: 0;
 }
