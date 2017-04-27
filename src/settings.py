@@ -1,16 +1,18 @@
-from datetime import timedelta
 import os
 from typing import *
 import yaml
-from apartcore import default_datetime_to_utc
+from util import default_datetime_to_utc
+
+
+def default_config_directory() -> str:
+    return os.path.expanduser('~') + '/.config/apart-gtk'
 
 
 def config_directory() -> str:
     env_dir = os.environ.get('APART_GTK_CONFIG_DIR')
     if env_dir and env_dir.endswith('/'):
         env_dir = env_dir[:-1]
-    default_dir = os.path.expanduser('~') + '/.config/apart-gtk'
-    return env_dir or default_dir
+    return env_dir or default_config_directory()
 
 
 def history_path() -> str:
