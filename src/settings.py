@@ -1,3 +1,4 @@
+from datetime import timedelta
 import os
 from typing import *
 import yaml
@@ -28,3 +29,7 @@ def write_history(history: List[Dict]):
         os.makedirs(os.path.dirname(history_path()))
     with open(history_path(), 'w') as file:
         file.write(yaml.dump(history))
+
+
+def animation_duration_ms() -> int:
+    return 200

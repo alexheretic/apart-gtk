@@ -5,6 +5,8 @@ from partinfo import PartitionInfo
 from progress import ProgressAndHistoryView
 from gi.repository import Gtk
 
+import settings
+
 
 class CloneBody(Gtk.Box):
     def __init__(self, core: ApartCore, sources: List[Dict[str, Any]]):
@@ -49,7 +51,7 @@ class MainView(Gtk.Stack):
     def __init__(self, core: ApartCore):
         Gtk.Stack.__init__(self)
         self.set_transition_type(Gtk.StackTransitionType.NONE)
-        self.set_transition_duration(200)
+        self.set_transition_duration(settings.animation_duration_ms())
         self.new_clone = CloneToImageEntry(self, core)
         self.add_named(self.new_clone, name='new-clone')
         self.progress = ProgressAndHistoryView(core)

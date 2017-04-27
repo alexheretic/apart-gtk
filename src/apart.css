@@ -35,6 +35,9 @@
 .finished-jobs, .jobs {
   padding: 6px;
 }
+.finished-jobs separator {
+  margin: 6px 0;
+}
 .job-stats {
   margin-top: -3px;
 }

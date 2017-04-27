@@ -30,7 +30,7 @@ class Window(Gtk.Window):
         self.status_listener = MessageListener(
             on_message=lambda m: GLib.idle_add(self.on_status_msg, m),
             message_predicate=lambda m: m['type'] == 'status')
-        self.core = ApartCore(listeners=[self.status_listener])
+        self.core: ApartCore = ApartCore(listeners=[self.status_listener])
 
         self.set_default_size(height=300, width=-1)
         self.set_titlebar(Header())
@@ -41,6 +41,7 @@ class Window(Gtk.Window):
         self.add(self.loading_body)
 
         self.connect('delete-event', self.on_delete)
+        # self.set_events(Gdk.EventMask.BUTTON_PRESS_MASK)
 
     def on_status_msg(self, msg: Dict):
         if msg['status'] == 'dying':

@@ -1,4 +1,3 @@
-from typing import *
 from gi.repository import Gtk
 
 
