@@ -6,13 +6,7 @@ import sys
 from apartcore import ApartCore, MessageListener
 from main import CloneBody
 from typing import *
-from gi.repository import GLib, Gio, Gtk, Gdk
-
-
-class Header(Gtk.HeaderBar):
-    def __init__(self):
-        Gtk.HeaderBar.__init__(self, title='apart')
-        self.set_show_close_button(True)
+from gi.repository import GLib, Gtk, Gdk
 
 
 class LoadingBody(Gtk.Grid):
@@ -25,7 +19,7 @@ class LoadingBody(Gtk.Grid):
 
 class Window(Gtk.Window):
     def __init__(self):
-        Gtk.Window.__init__(self, title='')
+        Gtk.Window.__init__(self, title='apart')
 
         self.status_listener = MessageListener(
             on_message=lambda m: GLib.idle_add(self.on_status_msg, m),
@@ -33,7 +27,6 @@ class Window(Gtk.Window):
         self.core: ApartCore = ApartCore(listeners=[self.status_listener])
 
         self.set_default_size(height=300, width=-1)
-        self.set_titlebar(Header())
 
         self.loading_body = LoadingBody()
         self.clone_body = None
@@ -41,7 +34,6 @@ class Window(Gtk.Window):
         self.add(self.loading_body)
 
         self.connect('delete-event', self.on_delete)
-        # self.set_events(Gdk.EventMask.BUTTON_PRESS_MASK)
 
     def on_status_msg(self, msg: Dict):
         if msg['status'] == 'dying':
