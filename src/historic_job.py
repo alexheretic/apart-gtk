@@ -163,7 +163,7 @@ class SuccessfulClone(FinishedClone):
         FinishedClone.__init__(self, final_message, progress_view, core, icon_name='object-select-symbolic',
                                forget_on_rerun=False)
         self.duration = key_and_val(DURATION_KEY, str(round_to_second(self.msg['finish'] - self.msg['start'])))
-        self.image_size = key_and_val('Image size', humanize.naturalsize(99999999999, binary=True))
+        self.image_size = key_and_val('Image size', humanize.naturalsize(self.msg['image_size'], binary=True))
         self.filename = key_and_val('Image file', extract_filename(self.msg['destination']))
         self.stats = Gtk.VBox()
         for stat in [self.filename, self.image_size, self.duration]:

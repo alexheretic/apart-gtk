@@ -84,8 +84,8 @@ class RunningClone:
         return True
 
     def update_remaining(self):
-        if self.last_message.get('estimatedFinish'):
-            estimated_remaining = self.last_message['estimatedFinish'] - datetime.now(timezone.utc)
+        if self.last_message.get('estimated_finish'):
+            estimated_remaining = self.last_message['estimated_finish'] - datetime.now(timezone.utc)
             if estimated_remaining < timedelta(seconds=5):
                 estimated_remaining_str = 'a few seconds'
             else:

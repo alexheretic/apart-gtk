@@ -1,9 +1,12 @@
 from typing import *
 from gi.repository import GLib, Gtk
+import logging
 from apartcore import ApartCore, MessageListener
 from historic_job import FailedClone, SuccessfulClone
 from running_job import RunningClone
 import settings
+
+log = logging.getLogger('ProgressAndHistoryView')
 
 
 class ProgressAndHistoryView(Gtk.Stack):
@@ -56,11 +59,14 @@ class ProgressAndHistoryView(Gtk.Stack):
 
     def read_history(self):
         for historic_job_msg in settings.read_history():
-            if historic_job_msg.get('error'):
-                job = FailedClone(historic_job_msg, progress_view=self, core=self.core)
-            else:
-                job = SuccessfulClone(historic_job_msg, progress_view=self, core=self.core)
-            self.finished_jobs[historic_job_msg['id']] = job
+            try:
+                if historic_job_msg.get('error'):
+                    job = FailedClone(historic_job_msg, progress_view=self, core=self.core)
+                else:
+                    job = SuccessfulClone(historic_job_msg, progress_view=self, core=self.core)
+                self.finished_jobs[historic_job_msg['id']] = job
+            except KeyError as e:
+                log.warning('Error constructing FinishedJob from historic data ' + str(e))
 
         for job in sorted(self.finished_jobs.values(),
                           key=lambda j: j.finish,
