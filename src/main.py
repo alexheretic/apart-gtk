@@ -5,17 +5,18 @@ from partinfo import PartitionInfo
 from progress import ProgressAndHistoryView
 from gi.repository import Gtk
 
+from restoreentry import RestoreFromImageEntry
 import settings
 
 
 class CloneBody(Gtk.Box):
-    def __init__(self, core: ApartCore, sources: List[Dict[str, Any]]):
+    def __init__(self, core: ApartCore, sources: List[Dict[str, Any]], root: Gtk.Window):
         Gtk.Box.__init__(self)
         self.core = core
         self.sources = sources
 
         right_panes = Gtk.VPaned(expand=True)
-        self.main_view = MainView(core)
+        self.main_view = MainView(core, root)
         self.info_view = ClonePartInfo(sources, core, self.main_view)
         right_panes.pack1(self.info_view, shrink=False)
         right_panes.pack2(self.main_view, shrink=False)
@@ -40,15 +41,16 @@ class ClonePartInfo(Gtk.Stack):
                     self.add_titled(info, name=info.name(), title=info.title())
 
         self.connect('notify::visible-child', self.on_child_change)
-        self.get_style_context().add_class('clone-part-info')
+        self.get_style_context().add_class('part-info')
         self.show_all()
 
     def on_child_change(self, stack, param):
         self.main_view.new_clone.use_defaults_for(self.get_visible_child())
+        self.main_view.new_restore.use_defaults_for(self.get_visible_child())
 
 
 class MainView(Gtk.Stack):
-    def __init__(self, core: ApartCore):
+    def __init__(self, core: ApartCore, root: Gtk.Window):
         Gtk.Stack.__init__(self)
         self.set_transition_type(Gtk.StackTransitionType.NONE)
         self.set_transition_duration(settings.animation_duration_ms())
@@ -56,6 +58,8 @@ class MainView(Gtk.Stack):
         self.add_named(self.new_clone, name='new-clone')
         self.progress = ProgressAndHistoryView(core)
         self.add_named(self.progress, name='progress')
+        self.new_restore = RestoreFromImageEntry(self, core, root)
+        self.add_named(self.new_restore, name='new-restore')
 
     def show(self, name, fade: bool):
         if fade:
@@ -68,3 +72,6 @@ class MainView(Gtk.Stack):
 
     def show_new_clone(self, fade: bool = False):
         self.show('new-clone', fade)
+
+    def show_new_restore(self, fade: bool = False):
+        self.show('new-restore', fade)

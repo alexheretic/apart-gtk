@@ -2,8 +2,10 @@ from typing import *
 from gi.repository import GLib, Gtk
 import logging
 from apartcore import ApartCore, MessageListener
-from historic_job import FailedClone, SuccessfulClone
-from running_job import RunningClone
+import historic_job
+from historic_job import FinishedJob
+import running_job
+from running_job import RunningJob
 import settings
 
 log = logging.getLogger('ProgressAndHistoryView')
@@ -26,7 +28,7 @@ class ProgressAndHistoryView(Gtk.Stack):
         self.running_jobs_label.get_style_context().add_class('section-title')
         self.content.add(self.running_jobs_label)
 
-        self.running_jobs: Dict[str, RunningClone] = {}
+        self.running_jobs: Dict[str, RunningJob] = {}
         self.running_jobs_grid = Gtk.Grid(orientation=Gtk.Orientation.VERTICAL,
                                           column_spacing=6,
                                           row_spacing=6)
@@ -34,7 +36,7 @@ class ProgressAndHistoryView(Gtk.Stack):
         self.running_jobs_grid.get_style_context().add_class('jobs')
         self.content.add(self.running_jobs_grid)
 
-        self.finished_jobs: Dict[str, SuccessfulClone] = {}
+        self.finished_jobs: Dict[str, FinishedJob] = {}
         self.finished_jobs_label = Gtk.Label('History', halign=Gtk.Align.START)
         self.finished_jobs_label.get_style_context().add_class('section-title')
         self.content.add(self.finished_jobs_label)
@@ -46,12 +48,12 @@ class ProgressAndHistoryView(Gtk.Stack):
 
         self.show_all()
 
-        self.listener = MessageListener(message_predicate=lambda m: m['type'] == 'clone',
-                                        on_message=lambda m: GLib.idle_add(self.on_clone_message, m),
+        self.listener = MessageListener(message_predicate=lambda m: m['type'] in ['clone',
+                                                                                  'restore',
+                                                                                  'clone-failed',
+                                                                                  'restore-failed'],
+                                        on_message=lambda m: GLib.idle_add(self.on_job_message, m),
                                         listen_to=core)
-        self.fail_listener = MessageListener(message_predicate=lambda m: m['type'] == 'clone-failed',
-                                             on_message=lambda m: GLib.idle_add(self.on_clone_fail_message, m),
-                                             listen_to=core)
 
         GLib.timeout_add(interval=1000, function=self.update_jobs)
         self.connect('destroy', self.save_history)
@@ -60,11 +62,9 @@ class ProgressAndHistoryView(Gtk.Stack):
     def read_history(self):
         for historic_job_msg in settings.read_history():
             try:
-                if historic_job_msg.get('error'):
-                    job = FailedClone(historic_job_msg, progress_view=self, core=self.core)
-                else:
-                    job = SuccessfulClone(historic_job_msg, progress_view=self, core=self.core)
-                self.finished_jobs[historic_job_msg['id']] = job
+                self.finished_jobs[historic_job_msg['id']] = historic_job.create(historic_job_msg,
+                                                                                 progress_view=self,
+                                                                                 core=self.core)
             except KeyError as e:
                 log.warning('Error constructing FinishedJob from historic data ' + str(e))
 
@@ -74,22 +74,15 @@ class ProgressAndHistoryView(Gtk.Stack):
             job.add_to_grid(self.finished_jobs_grid)
         self.update_view()
 
-    def on_clone_message(self, msg: Dict):
-        job = self.running_jobs.get(msg['id'])
-        if not job:
-            job = RunningClone(self.core, on_finish=self.on_job_finish)
-            self.running_jobs[msg['id']] = job
-            job.add_to_grid(self.running_jobs_grid)
-        job.handle_message(msg)
-        self.update_view()
+    def new_running_job(self, msg: Dict) -> RunningJob:
+        job = running_job.create(msg, self.core, on_finish=self.on_job_finish)
+        self.running_jobs[msg['id']] = job
+        job.add_to_grid(self.running_jobs_grid)
+        return job
 
-    def on_clone_fail_message(self, msg: Dict):
-        job = self.running_jobs.get(msg['id'])
-        if not job:
-            job = RunningClone(self.core, on_finish=self.on_job_finish)
-            self.running_jobs[msg['id']] = job
-            job.add_to_grid(self.running_jobs_grid)
-        job.handle_fail_message(msg)
+    def on_job_message(self, msg: Dict):
+        job = self.running_jobs.get(msg['id']) or self.new_running_job(msg)
+        job.handle_message(msg)
         self.update_view()
 
     def update_view(self):
@@ -114,11 +107,7 @@ class ProgressAndHistoryView(Gtk.Stack):
         job = self.running_jobs[job_id]
         job.remove_from_grid()
         del self.running_jobs[job_id]
-        if final_msg.get('error'):
-            job = FailedClone(final_msg, progress_view=self, core=self.core)
-        else:
-            job = SuccessfulClone(final_msg, progress_view=self, core=self.core)
-
+        job = historic_job.create(final_msg, progress_view=self, core=self.core)
         job.reveal_extra()  # show extra details of newest finished job
 
         # remove all and re-add for ordering
@@ -141,7 +130,7 @@ class ProgressAndHistoryView(Gtk.Stack):
 
         self.update_view()
 
-    def forget(self, job: 'FinishedClone'):
+    def forget(self, job: FinishedJob):
         del self.finished_jobs[job.msg['id']]
         job.remove_from_grid()
         self.update_view()

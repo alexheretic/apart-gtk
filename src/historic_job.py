@@ -25,7 +25,7 @@ class RevealState(Enum):
         return cls.HIDDEN
 
 
-class FinishedClone:
+class FinishedJob:
     def __init__(self, final_message: Dict,
                  progress_view: 'ProgressAndHistoryView',
                  core: ApartCore,
@@ -38,6 +38,8 @@ class FinishedClone:
         self.tenant = None
         self.forget_on_rerun = forget_on_rerun
         self.extra_user_state: RevealState = None
+
+        self.duration = key_and_val(DURATION_KEY, str(round_to_second(self.msg['finish'] - self.msg['start'])))
 
         self.icon = Gtk.Image.new_from_icon_name(icon_name, Gtk.IconSize.LARGE_TOOLBAR)
         self.title_label = Gtk.Label(self.purpose(), xalign=0)
@@ -58,11 +60,11 @@ class FinishedClone:
         self.finish_box.add(self.finish_label)
         self.finish_box.connect('button-press-event', self.on_row_click)
 
-        self.rerun_btn = Gtk.Button(RERUN_TEXT, halign=Gtk.Align.END, visible=True)
+        self.rerun_btn = Gtk.Button(RERUN_TEXT, visible=True)
         self.rerun_btn.connect('clicked', self.rerun)
-        self.forget_btn = Gtk.Button(FORGET_TEXT, halign=Gtk.Align.END, visible=True)
+        self.forget_btn = Gtk.Button(FORGET_TEXT, visible=True)
         self.forget_btn.connect('clicked', self.forget)
-        self.buttons = Gtk.Box(visible=True)
+        self.buttons = Gtk.Box(visible=True, halign=Gtk.Align.END)
         self.buttons.add(self.rerun_btn)
         self.buttons.add(self.forget_btn)
         self.buttons.get_style_context().add_class('job-buttons')
@@ -74,7 +76,7 @@ class FinishedClone:
     def purpose(self) -> str:
         return '{} -> {}'.format(rm_dev(self.msg['source']), extract_directory(self.msg['destination']))
 
-    def similar_to(self, other: 'FinishedClone') -> bool:
+    def similar_to(self, other: 'FinishedJob') -> bool:
         """:return True => other is similar enough for both not to need to appear in the history grid"""
         return type(self) == type(other) and self.purpose() == other.purpose()
 
@@ -128,21 +130,20 @@ class FinishedClone:
         if self.forget_on_rerun:
             self.forget()
 
+    def add_to_grid(self, grid: Gtk.Grid):
+        raise Exception('abstract')
 
-class FailedClone(FinishedClone):
+
+class FailedClone(FinishedJob):
     def __init__(self, final_message: Dict, progress_view: 'ProgressAndHistoryView', core: ApartCore):
-        FinishedClone.__init__(self, final_message, progress_view, core, icon_name='dialog-error')
-
+        FinishedJob.__init__(self, final_message, progress_view, core, icon_name='dialog-error')
         self.fail_reason = key_and_val('Failed', self.msg['error'])
-        self.duration = key_and_val(DURATION_KEY, str(round_to_second(self.msg['finish'] - self.msg['start'])))
         self.stats = Gtk.VBox()
         self.stats.add(self.fail_reason)
         self.stats.add(self.duration)
         self.stats.get_style_context().add_class('finished-job-stats')
         self.stats.show_all()
         self.extra.add(self.stats)
-
-        self.update()
 
     def add_to_grid(self, grid: Gtk.Grid):
         if self.tenant:
@@ -158,11 +159,10 @@ class FailedClone(FinishedClone):
         tenant.attach(self.extra, top=base+1, width=FINISHED_JOB_COLUMNS)
 
 
-class SuccessfulClone(FinishedClone):
+class SuccessfulClone(FinishedJob):
     def __init__(self, final_message: Dict, progress_view: 'ProgressAndHistoryView', core: ApartCore):
-        FinishedClone.__init__(self, final_message, progress_view, core, icon_name='object-select-symbolic',
-                               forget_on_rerun=False)
-        self.duration = key_and_val(DURATION_KEY, str(round_to_second(self.msg['finish'] - self.msg['start'])))
+        FinishedJob.__init__(self, final_message, progress_view, core, icon_name='object-select-symbolic',
+                             forget_on_rerun=False)
         self.image_size = key_and_val('Image size', humanize.naturalsize(self.msg['image_size'], binary=True))
         self.filename = key_and_val('Image file', extract_filename(self.msg['destination']))
         self.stats = Gtk.VBox()
@@ -185,9 +185,86 @@ class SuccessfulClone(FinishedClone):
         tenant.attach(self.buttons, top=base, left=2)
         tenant.attach(self.extra, top=base + 1, width=FINISHED_JOB_COLUMNS)
 
-    def similar_to(self, other: FinishedClone) -> bool:
+    def similar_to(self, other: FinishedJob) -> bool:
         """
         As successful clones indicate space being taken up on the file system, it should only be lost from the history 
         if another task overwrote the same file (which as it includes at to-minute timestamp should be rare)
         """
-        return FinishedClone.similar_to(self, other) and self.msg['destination'] == other.msg['destination']
+        return FinishedJob.similar_to(self, other) and self.msg['destination'] == other.msg['destination']
+
+
+class FailedRestore(FinishedJob):
+    def __init__(self, final_message: Dict, progress_view: 'ProgressAndHistoryView', core: ApartCore):
+        FinishedJob.__init__(self, final_message, progress_view, core, icon_name='dialog-error')
+        self.fail_reason = key_and_val('Failed', self.msg['error'])
+        self.image_source = key_and_val('Restoring from', extract_filename(self.msg['source']))
+        self.stats = Gtk.VBox()
+        for stat in [self.fail_reason, self.image_source, self.duration]:
+            self.stats.add(stat)
+        self.stats.get_style_context().add_class('finished-job-stats')
+        self.stats.show_all()
+        self.extra.add(self.stats)
+        # naive rerun is unsafe for restore jobs as /dev/abc1 may refer to different partition than when last run
+        self.rerun_btn.destroy()
+
+    def add_to_grid(self, grid: Gtk.Grid):
+        if self.tenant:
+            raise Exception('Already added to a grid')
+        tenant = self.tenant = GridRowTenant(grid)
+        base = 0
+        if tenant.base_row > 0:
+            tenant.attach(Gtk.Separator(visible=True, hexpand=True), width=FINISHED_JOB_COLUMNS)
+            base += 1
+        tenant.attach(self.title_box, top=base)
+        tenant.attach(self.finish_box, top=base, left=1)
+        tenant.attach(self.buttons, top=base, left=2)
+        tenant.attach(self.extra, top=base+1, width=FINISHED_JOB_COLUMNS)
+
+    def purpose(self) -> str:
+        """Note: used for similarity"""
+        return 'Restore {}'.format(rm_dev(self.msg['destination']))
+
+
+class SuccessfulRestore(FinishedJob):
+    def __init__(self, final_message: Dict, progress_view: 'ProgressAndHistoryView', core: ApartCore):
+        FinishedJob.__init__(self, final_message, progress_view, core, icon_name='object-select-symbolic',
+                             forget_on_rerun=False)
+        self.stats = Gtk.VBox()
+        self.image_source = key_and_val('Restored from', extract_filename(self.msg['source']))
+        for stat in [self.image_source, self.duration]:
+            self.stats.add(stat)
+        self.stats.get_style_context().add_class('finished-job-stats')
+        self.stats.show_all()
+        self.extra.add(self.stats)
+        # naive rerun is unsafe for restore jobs as /dev/abc1 may refer to different partition than when last run
+        self.rerun_btn.destroy()
+
+    def add_to_grid(self, grid: Gtk.Grid):
+        if self.tenant:
+            raise Exception('Already added to a grid')
+        tenant = self.tenant = GridRowTenant(grid)
+        base = 0
+        if tenant.base_row > 0:
+            tenant.attach(Gtk.Separator(visible=True, hexpand=True), width=FINISHED_JOB_COLUMNS)
+            base += 1
+        tenant.attach(self.title_box, top=base)
+        tenant.attach(self.finish_box, top=base, left=1)
+        tenant.attach(self.buttons, top=base, left=2)
+        tenant.attach(self.extra, top=base + 1, width=FINISHED_JOB_COLUMNS)
+
+    def purpose(self) -> str:
+        """Note: used for similarity"""
+        return 'Restored {}'.format(rm_dev(self.msg['destination']))
+
+
+def create(final_message: Dict, progress_view: 'ProgressAndHistoryView', core: ApartCore) -> FinishedJob:
+    msg_type = final_message['type']
+    if msg_type == 'clone':
+        return SuccessfulClone(final_message, progress_view=progress_view, core=core)
+    elif msg_type == 'clone-failed':
+        return FailedClone(final_message, progress_view=progress_view, core=core)
+    elif msg_type == 'restore':
+        return SuccessfulRestore(final_message, progress_view=progress_view, core=core)
+    elif msg_type == 'restore-failed':
+        return FailedRestore(final_message, progress_view=progress_view, core=core)
+    raise Exception('Unknown type: ' + msg_type)

@@ -3,20 +3,20 @@
 ## Assume was called with expected args '-Jbo name,size,fstype,label,mountpoint'
 echo '{
    "blockdevices": [
-      {"name": "sda", "size": "750156374016", "fstype": null, "label": null, "mountpoint": null,
+      {"name": "sdx", "size": "750156374016", "fstype": null, "label": null, "mountpoint": null,
          "children": [
-            {"name": "sda1", "size": "104857600", "fstype": "ntfs", "label": "win reserved", "mountpoint": null},
-            {"name": "sda2", "size": "536766054400", "fstype": "ntfs", "label": "ssd", "mountpoint": null},
-            {"name": "sda3", "size": "181070200832", "fstype": "ext4", "label": "arch", "mountpoint": "/"},
-            {"name": "sda4", "size": "1024", "fstype": null, "label": null, "mountpoint": null},
-            {"name": "sda5", "size": "32212254720", "fstype": null, "label": null, "mountpoint": null}
+            {"name": "sdx1", "size": "104857600", "fstype": "ntfs", "label": "win reserved", "mountpoint": null},
+            {"name": "sdx2", "size": "536766054400", "fstype": "ntfs", "label": "ssd", "mountpoint": null},
+            {"name": "sdx3", "size": "181070200832", "fstype": "ext4", "label": "arch", "mountpoint": "/"},
+            {"name": "sdx4", "size": "1024", "fstype": null, "label": null, "mountpoint": null},
+            {"name": "sdx5", "size": "32212254720", "fstype": null, "label": null, "mountpoint": null}
          ]
       },
-      {"name": "sdb", "size": "62109253632", "fstype": null, "label": null, "mountpoint": null,
+      {"name": "sdy", "size": "62109253632", "fstype": null, "label": null, "mountpoint": null,
          "children": [
-            {"name": "sdb1", "size": "524288000", "fstype": "ext2", "label": "boot", "mountpoint": null},
-            {"name": "sdb2", "size": "2147483648", "fstype": "swap", "label": "swap", "mountpoint": null},
-            {"name": "sdb3", "size": "59436433408", "fstype": "f2fs", "label": "main", "mountpoint": null}
+            {"name": "sdy1", "size": "524288000", "fstype": "ext2", "label": "boot", "mountpoint": null},
+            {"name": "sdy2", "size": "2147483648", "fstype": "swap", "label": "swap", "mountpoint": null},
+            {"name": "sdy3", "size": "59436433408", "fstype": "f2fs", "label": "main", "mountpoint": null}
          ]
       }
    ]

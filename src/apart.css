@@ -11,17 +11,21 @@
   margin-left: 6px;
 }
 
-.part-info-key, .part-info-val {
+.info-key, .info-val {
   padding-top: 5px;
 }
-.part-info-key {
+.info-key {
   margin-right: 1ex;
 }
-.part-info-val {
+.info-val {
   margin-right: 2ex;
 }
-.clone-part-info {
+
+.part-info {
   padding: 6px;
+}
+.part-info button {
+  margin-left: 6px
 }
 
 .progress-view {

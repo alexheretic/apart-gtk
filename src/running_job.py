@@ -1,5 +1,3 @@
-from datetime import datetime, timezone
-from typing import *
 from gi.repository import Gtk
 import humanize
 from apartcore import ApartCore
@@ -10,9 +8,9 @@ from util import *
 RUNNING_JOB_COLUMNS = 2
 
 
-class RunningClone:
+class RunningJob:
     def __init__(self, core: ApartCore, on_finish: Callable[[Dict], None]):
-        """:param on_finish: called when run has finished, with the final message"""
+        """:param on_finish: called when job has received it's final message, with the this message as an arg"""
         self.core = core
         self.on_finish = on_finish
         self.last_message: Dict = None
@@ -64,14 +62,18 @@ class RunningClone:
         self.tenant = None
 
     def handle_message(self, msg: Dict):
-        self.last_message = msg
-        self.progress_bar.set_fraction(msg['complete'])
-        self.title.set_text('{} -> {}'.format(rm_dev(msg['source']), extract_directory(msg['destination'])))
-        self.rate.value_label.set_text(msg.get('rate') or 'Initializing')
-        if not self.start:
-            self.start = msg['start'].replace(tzinfo=msg['start'].tzinfo or timezone.utc)
-            self.update()
-        if msg.get('finish'):
+        if msg['type'] in ['clone', 'restore']:
+            self.last_message = msg
+            self.progress_bar.set_fraction(msg['complete'])
+            self.rate.value_label.set_text(msg.get('rate') or 'Initializing')
+            if not self.start:
+                self.start = msg['start'].replace(tzinfo=msg['start'].tzinfo or timezone.utc)
+                self.update()
+            if msg.get('finish'):
+                self.finish()
+
+        elif msg['type'] in ['clone-failed', 'restore-failed']:
+            self.fail_message = msg
             self.finish()
 
     def update(self) -> bool:
@@ -94,11 +96,49 @@ class RunningClone:
             self.estimated_completion.show_all()
 
     def cancel(self, b):
-        self.core.send('type: cancel-clone\nid: {}'.format(self.last_message['id']))
-
-    def handle_fail_message(self, msg: Dict):
-        self.fail_message = msg
-        self.finish()
+        raise Exception('abstract')
 
     def finish(self):
         self.on_finish(self.fail_message or self.last_message)
+
+    def finished(self) -> bool:
+        return bool(self.fail_message or self.last_message and self.last_message.get('finish'))
+
+
+class RunningClone(RunningJob):
+    """Display representation of a running partition clone"""
+    def __init__(self, core: ApartCore, on_finish: Callable[[Dict], None]):
+        RunningJob.__init__(self, core, on_finish)
+
+    def cancel(self, b):
+        self.core.send('type: cancel-clone\nid: {}'.format(self.last_message['id']))
+
+    def handle_message(self, msg: Dict):
+        RunningJob.handle_message(self, msg)
+        if not self.finished():
+            self.title.set_text('{} -> {}'.format(rm_dev(self.last_message['source']),
+                                                  extract_directory(self.last_message['destination'])))
+
+
+class RunningRestore(RunningJob):
+    """Display representation of a running partition restore"""
+    def __init__(self, core: ApartCore, on_finish: Callable[[Dict], None]):
+        RunningJob.__init__(self, core, on_finish)
+
+    def cancel(self, b):
+        self.core.send('type: cancel-restore\nid: {}'.format(self.last_message['id']))
+
+    def handle_message(self, msg: Dict):
+        RunningJob.handle_message(self, msg)
+        if not self.finished():
+            self.title.set_text('{} -> {}'.format(self.last_message['source'],
+                                                  rm_dev(self.last_message['destination'])))
+
+
+def create(msg: Dict, core: ApartCore, on_finish: Callable[[Dict], None]) -> RunningJob:
+    msg_type = msg['type']
+    if msg_type.startswith('clone'):
+        return RunningClone(core, on_finish)
+    elif msg_type.startswith('restore'):
+        return RunningRestore(core, on_finish)
+    raise Exception('Cannot create RunningJob from unknown type: ' + msg_type)

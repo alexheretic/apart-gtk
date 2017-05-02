@@ -1,5 +1,4 @@
 import re
-
 from apartcore import ApartCore
 from partinfo import PartitionInfo
 from gi.repository import Gtk
@@ -9,7 +8,7 @@ invalid_name_re = re.compile(r'[^A-Za-z0-9 _-]')
 
 class CloneToImageEntry(Gtk.Box):
     def __init__(self, main_view: 'MainView', core: ApartCore):
-        Gtk.Box.__init__(self, orientation=Gtk.Orientation.VERTICAL, expand=True)
+        Gtk.Box.__init__(self, orientation=Gtk.Orientation.VERTICAL, expand=True, halign=Gtk.Align.CENTER)
         self.main_view = main_view
         self.core = core
 
@@ -67,12 +66,8 @@ class CloneToImageEntry(Gtk.Box):
             self.start_btn.set_tooltip_text(None)
 
     def update_title(self):
-        if not self.last_part_info:
-            return
-        title = '{dev_name} -> compressed image file'.format(
-            dev_name=self.last_part_info.dev_name(),
-            backup_name=self.backup_name())
-        self.title.set_text(title)
+        if self.last_part_info:
+            self.title.set_text(self.last_part_info.dev_name() + ' -> compressed image file')
 
     def start_clone(self):
         backup_dir = self.dir_entry.get_filename()

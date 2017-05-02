@@ -6,7 +6,7 @@ import sys
 from apartcore import ApartCore, MessageListener
 from main import CloneBody
 from typing import *
-from gi.repository import GLib, Gtk, Gdk
+from gi.repository import GLib, Gtk, Gdk, Gio, GdkPixbuf
 
 
 class LoadingBody(Gtk.Grid):
@@ -35,11 +35,13 @@ class Window(Gtk.Window):
 
         self.connect('delete-event', self.on_delete)
 
+        self.set_icon_name('apart')
+
     def on_status_msg(self, msg: Dict):
         if msg['status'] == 'dying':
             self.on_delete()
         if msg['status'] == 'started':
-            self.clone_body = CloneBody(self.core, sources=msg['sources'])
+            self.clone_body = CloneBody(self.core, sources=msg['sources'], root=self)
             self.remove(self.loading_body)
             self.add(self.clone_body)
             self.clone_body.show_all()
