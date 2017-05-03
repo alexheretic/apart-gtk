@@ -1,12 +1,15 @@
-from enum import Enum, auto
 import uuid
 import yaml
 import subprocess
 import sys
+import os
 import zmq
 from threading import Thread
 from typing import *
 from util import default_datetime_to_utc
+
+# True: print out messages <--> core
+LOG_MESSAGES = True
 
 
 class MessageListener:
@@ -47,10 +50,10 @@ class ApartCore(Thread):
         self.socket.bind(self.ipc_address)
         self.listeners: List[MessageListener] = listeners or []
 
-        # debug listen to messages
-        self.register(MessageListener(lambda msg: print('apart-core ->\n {}'.format(str(msg)))))
+        if LOG_MESSAGES:
+            self.register(MessageListener(lambda msg: print('apart-core ->\n {}'.format(str(msg)))))
 
-        apart_core_cmd = 'apart-core/target/debug/apart-core'
+        apart_core_cmd = os.environ.get('APART_GTK_CORE_CMD') or 'apart-core'  # TODO confirm default
         try:
             self.process = subprocess.Popen([apart_core_cmd, self.ipc_address])
         except FileNotFoundError:
@@ -83,7 +86,8 @@ class ApartCore(Thread):
     def send(self, message: str):
         if not self.zmq_context.closed:
             self.socket.send_string(message)
-            print('apart-core <-\n----\n{}\n----'.format(message))
+            if LOG_MESSAGES:
+                print('apart-core <-\n----\n{}\n----'.format(message))
 
     def register(self, message_listener: MessageListener) -> Callable[[], None]:
         """:return: remove function"""

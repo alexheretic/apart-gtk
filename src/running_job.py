@@ -65,12 +65,13 @@ class RunningJob:
         if msg['type'] in ['clone', 'restore']:
             self.last_message = msg
             self.progress_bar.set_fraction(msg['complete'])
-            self.rate.value_label.set_text(msg.get('rate') or 'Initializing')
             if not self.start:
                 self.start = msg['start'].replace(tzinfo=msg['start'].tzinfo or timezone.utc)
                 self.update()
             if msg.get('finish'):
                 self.finish()
+            else:
+                self.rate.value_label.set_text(msg.get('rate') or 'Initializing')
 
         elif msg['type'] in ['clone-failed', 'restore-failed']:
             self.fail_message = msg

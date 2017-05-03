@@ -52,8 +52,6 @@ class CloneToImageEntry(Gtk.Box):
     def use_defaults_for(self, part_info: PartitionInfo):
         default_backup_name = part_info.label() or part_info.name()
         self.name_entry.set_text(default_backup_name.replace(' ', '_'))
-        if self.dir_entry.get_filename() is None:
-            self.dir_entry.set_filename('/tmp')
 
         self.last_part_info = part_info
         self.update_title()
