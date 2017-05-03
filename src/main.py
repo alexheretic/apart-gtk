@@ -10,13 +10,13 @@ import settings
 
 
 class CloneBody(Gtk.Box):
-    def __init__(self, core: ApartCore, sources: List[Dict[str, Any]], root: Gtk.Window):
+    def __init__(self, core: ApartCore, sources: List[Dict[str, Any]]):
         Gtk.Box.__init__(self)
         self.core = core
         self.sources = sources
 
         right_panes = Gtk.VPaned(expand=True)
-        self.main_view = MainView(core, root)
+        self.main_view = MainView(core)
         self.info_view = ClonePartInfo(sources, core, self.main_view)
         right_panes.pack1(self.info_view, shrink=False)
         right_panes.pack2(self.main_view, shrink=False)
@@ -50,7 +50,7 @@ class ClonePartInfo(Gtk.Stack):
 
 
 class MainView(Gtk.Stack):
-    def __init__(self, core: ApartCore, root: Gtk.Window):
+    def __init__(self, core: ApartCore):
         Gtk.Stack.__init__(self)
         self.set_transition_type(Gtk.StackTransitionType.NONE)
         self.set_transition_duration(settings.animation_duration_ms())
@@ -58,7 +58,7 @@ class MainView(Gtk.Stack):
         self.add_named(self.new_clone, name='new-clone')
         self.progress = ProgressAndHistoryView(core)
         self.add_named(self.progress, name='progress')
-        self.new_restore = RestoreFromImageEntry(self, core, root)
+        self.new_restore = RestoreFromImageEntry(self, core)
         self.add_named(self.new_restore, name='new-restore')
 
     def show(self, name, fade: bool):

@@ -1,32 +1,14 @@
 from apartcore import ApartCore
+from dialog import WarningDialog
 from partinfo import PartitionInfo
 from gi.repository import Gtk
 
 
-class WarningDialog(Gtk.MessageDialog):
-    def __init__(self, root: Gtk.Window):
-        Gtk.MessageDialog.__init__(self, root, 0, message_type=Gtk.MessageType.WARNING)
-        # self.set_decorated()
-        self.set_title('Overwrite partition')
-        self.icon = Gtk.Image.new_from_icon_name('dialog-warning', Gtk.IconSize.LARGE_TOOLBAR)
-        self.text = Gtk.Label('Restoring this image will overwrite all current partition data')
-        heading = Gtk.Box()
-        heading.add(self.icon)
-        heading.add(self.text)
-
-        self.get_message_area().add(heading)
-        self.get_message_area().set_spacing(0)
-        self.add_button(Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL)
-        self.add_button('Restore', Gtk.ResponseType.OK)
-        self.show_all()
-
-
 class RestoreFromImageEntry(Gtk.Box):
-    def __init__(self, main_view: 'MainView', core: ApartCore, root: Gtk.Window):
+    def __init__(self, main_view: 'MainView', core: ApartCore):
         Gtk.Box.__init__(self, orientation=Gtk.Orientation.VERTICAL, expand=True, halign=Gtk.Align.CENTER)
         self.main_view = main_view
         self.core = core
-        self.root = root
 
         self.title = Gtk.Label('', xalign=0.5)
         self.title.get_style_context().add_class('dim-label')
@@ -84,7 +66,10 @@ class RestoreFromImageEntry(Gtk.Box):
             self.title.set_text('Image file -> ' + self.last_part_info.dev_name())
 
     def user_confirm(self):
-        dialog = WarningDialog(self.root)
+        dialog = WarningDialog(self.get_toplevel(),
+                               header='Overwrite partition',
+                               text='Restoring this image will overwrite all current partition data',
+                               ok_button_text='Restore')
         response = dialog.run()
         if response == Gtk.ResponseType.OK:
             self.start()

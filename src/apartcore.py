@@ -1,3 +1,4 @@
+from enum import Enum, auto
 import uuid
 import yaml
 import subprocess
@@ -11,8 +12,11 @@ from util import default_datetime_to_utc
 class MessageListener:
     def __init__(self, on_message: Callable[[Dict], None],
                  message_predicate: Callable[[Dict], bool] = lambda m: True,
-                 listen_to: 'ApartCore' = None):
-        self.on_message = on_message
+                 listen_to: 'ApartCore' = None,
+                 one_time: bool = False):
+        self.one_time = one_time
+        self.input_on_message = on_message
+
         self.message_predicate = message_predicate
         self.remove_fn = None
         if listen_to:
@@ -26,6 +30,11 @@ class MessageListener:
         if self.remove_fn is not None:
             self.remove_fn()
         return self
+
+    def on_message(self, msg: Dict) -> bool:
+        """Return False implies stop listening"""
+        self.input_on_message(msg)
+        return not self.one_time
 
 
 class ApartCore(Thread):
@@ -55,9 +64,13 @@ class ApartCore(Thread):
         while self.process.returncode is None:
             msg = yaml.load(self.socket.recv_string())
             default_datetime_to_utc(msg)
+            to_remove = []
             for listener in self.listeners:
                 if listener.message_predicate(msg):
-                    listener.on_message(msg)
+                    if not listener.on_message(msg):
+                        to_remove.append(listener)
+            for listener in to_remove:
+                listener.stop_listening()
             if msg['type'] == 'status' and msg['status'] == 'dying':
                 break
         self.zmq_context.destroy()

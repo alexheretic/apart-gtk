@@ -24,7 +24,7 @@ class Window(Gtk.Window):
         self.status_listener = MessageListener(
             on_message=lambda m: GLib.idle_add(self.on_status_msg, m),
             message_predicate=lambda m: m['type'] == 'status')
-        self.core: ApartCore = ApartCore(listeners=[self.status_listener])
+        self.core = ApartCore(listeners=[self.status_listener])
 
         self.set_default_size(height=300, width=-1)
 
@@ -41,7 +41,7 @@ class Window(Gtk.Window):
         if msg['status'] == 'dying':
             self.on_delete()
         if msg['status'] == 'started':
-            self.clone_body = CloneBody(self.core, sources=msg['sources'], root=self)
+            self.clone_body = CloneBody(self.core, sources=msg['sources'])
             self.remove(self.loading_body)
             self.add(self.clone_body)
             self.clone_body.show_all()

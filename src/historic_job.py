@@ -1,9 +1,8 @@
-from datetime import datetime, timezone
-from enum import auto, Enum
-from typing import *
+from enum import Enum, auto
 from gi.repository import Gtk
 import humanize
-from apartcore import ApartCore
+from apartcore import ApartCore, MessageListener
+from dialog import WarningDialog
 from gtktools import GridRowTenant
 from partinfo import key_and_val
 import settings
@@ -60,14 +59,17 @@ class FinishedJob:
         self.finish_box.add(self.finish_label)
         self.finish_box.connect('button-press-event', self.on_row_click)
 
-        self.rerun_btn = Gtk.Button(RERUN_TEXT, visible=True)
+        self.rerun_btn = Gtk.Button.new_from_icon_name('view-refresh-symbolic', Gtk.IconSize.SMALL_TOOLBAR)
+        self.rerun_btn.set_tooltip_text('Run Again')
         self.rerun_btn.connect('clicked', self.rerun)
-        self.forget_btn = Gtk.Button(FORGET_TEXT, visible=True)
+        self.forget_btn = Gtk.Button(FORGET_TEXT)
+        self.forget_btn.set_tooltip_text('Remove from history')
         self.forget_btn.connect('clicked', self.forget)
         self.buttons = Gtk.Box(visible=True, halign=Gtk.Align.END)
         self.buttons.add(self.rerun_btn)
         self.buttons.add(self.forget_btn)
         self.buttons.get_style_context().add_class('job-buttons')
+        self.buttons.show_all()
 
         self.extra = Gtk.Revealer(transition_duration=settings.animation_duration_ms(), visible=True)
         self.extra.set_reveal_child(RevealState.default() is RevealState.REVEALED)
@@ -171,6 +173,12 @@ class SuccessfulClone(FinishedJob):
         self.stats.get_style_context().add_class('finished-job-stats')
         self.stats.show_all()
         self.extra.add(self.stats)
+        self.delete_image_btn = Gtk.Button.new_from_icon_name('user-trash-full-symbolic', Gtk.IconSize.SMALL_TOOLBAR)
+        self.delete_image_btn.set_tooltip_text('Delete image file')
+        self.delete_image_btn.show_all()
+        self.delete_image_btn.connect('clicked', self.delete_image)
+        self.buttons.add(self.delete_image_btn)
+        self.buttons.reorder_child(self.delete_image_btn, 0)
 
     def add_to_grid(self, grid: Gtk.Grid):
         if self.tenant:
@@ -191,6 +199,27 @@ class SuccessfulClone(FinishedJob):
         if another task overwrote the same file (which as it includes at to-minute timestamp should be rare)
         """
         return FinishedJob.similar_to(self, other) and self.msg['destination'] == other.msg['destination']
+
+    def delete_image(self, arg=None):
+        filename = self.msg['destination']
+        dialog = WarningDialog(self.delete_image_btn.get_toplevel(),
+                               header='Delete image file',
+                               text="Delete {}?".format(filename))
+        user_response = dialog.run()
+        dialog.destroy()
+        if user_response != Gtk.ResponseType.OK:
+            return
+
+        for btn in self.buttons.get_children():
+            btn.set_sensitive(False)
+            btn.set_tooltip_text('Deleting...')
+
+        MessageListener(message_predicate=lambda m: m['type'] == 'deleted-clone' and m['file'] == filename,
+                        on_message=lambda m: self.forget(),
+                        listen_to=self.core,
+                        one_time=True)
+
+        self.core.send('type: delete-clone\nfile: ' + filename)
 
 
 class FailedRestore(FinishedJob):
