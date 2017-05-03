@@ -1,5 +1,5 @@
 from apartcore import ApartCore
-from dialog import WarningDialog
+from dialog import OkCancelDialog
 from partinfo import PartitionInfo
 from gi.repository import Gtk
 
@@ -66,10 +66,11 @@ class RestoreFromImageEntry(Gtk.Box):
             self.title.set_text('Image file -> ' + self.last_part_info.dev_name())
 
     def user_confirm(self):
-        dialog = WarningDialog(self.get_toplevel(),
-                               header='Overwrite partition',
-                               text='Restoring this image will overwrite all current partition data',
-                               ok_button_text='Restore')
+        dialog = OkCancelDialog(self.get_toplevel(),
+                                header='Overwrite partition',
+                                text='Restoring this image will overwrite all current partition data',
+                                ok_button_text='Restore',
+                                message_type=Gtk.MessageType.WARNING)
         response = dialog.run()
         if response == Gtk.ResponseType.OK:
             self.start()

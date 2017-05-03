@@ -1,17 +1,18 @@
 from enum import Enum, auto
-from gi.repository import Gtk
+from gi.repository import Gtk, GLib
 import humanize
 from apartcore import ApartCore, MessageListener
-from dialog import WarningDialog
+from dialog import OkCancelDialog, OkDialog
 from gtktools import GridRowTenant
 from partinfo import key_and_val
 import settings
 from util import *
 
 FINISHED_JOB_COLUMNS = 3
-RERUN_TEXT = 'Rerun'
 FORGET_TEXT = 'Clear'
-DELETE_TEXT = 'Delete'
+FORGET_TIP = 'Remove from history'
+RERUN_TIP = 'Run Again'
+DELETE_TIP = 'Delete image file'
 DURATION_KEY = 'Runtime'
 
 
@@ -60,10 +61,10 @@ class FinishedJob:
         self.finish_box.connect('button-press-event', self.on_row_click)
 
         self.rerun_btn = Gtk.Button.new_from_icon_name('view-refresh-symbolic', Gtk.IconSize.SMALL_TOOLBAR)
-        self.rerun_btn.set_tooltip_text('Run Again')
+        self.rerun_btn.set_tooltip_text(RERUN_TIP)
         self.rerun_btn.connect('clicked', self.rerun)
         self.forget_btn = Gtk.Button(FORGET_TEXT)
-        self.forget_btn.set_tooltip_text('Remove from history')
+        self.forget_btn.set_tooltip_text(FORGET_TIP)
         self.forget_btn.connect('clicked', self.forget)
         self.buttons = Gtk.Box(visible=True, halign=Gtk.Align.END)
         self.buttons.add(self.rerun_btn)
@@ -174,7 +175,7 @@ class SuccessfulClone(FinishedJob):
         self.stats.show_all()
         self.extra.add(self.stats)
         self.delete_image_btn = Gtk.Button.new_from_icon_name('user-trash-full-symbolic', Gtk.IconSize.SMALL_TOOLBAR)
-        self.delete_image_btn.set_tooltip_text('Delete image file')
+        self.delete_image_btn.set_tooltip_text(DELETE_TIP)
         self.delete_image_btn.show_all()
         self.delete_image_btn.connect('clicked', self.delete_image)
         self.buttons.add(self.delete_image_btn)
@@ -202,9 +203,10 @@ class SuccessfulClone(FinishedJob):
 
     def delete_image(self, arg=None):
         filename = self.msg['destination']
-        dialog = WarningDialog(self.delete_image_btn.get_toplevel(),
-                               header='Delete image file',
-                               text="Delete {}?".format(filename))
+        dialog = OkCancelDialog(self.delete_image_btn.get_toplevel(),
+                                header='Delete image file',
+                                text="Delete {}?".format(filename),
+                                message_type=Gtk.MessageType.WARNING)
         user_response = dialog.run()
         dialog.destroy()
         if user_response != Gtk.ResponseType.OK:
@@ -214,8 +216,25 @@ class SuccessfulClone(FinishedJob):
             btn.set_sensitive(False)
             btn.set_tooltip_text('Deleting...')
 
-        MessageListener(message_predicate=lambda m: m['type'] == 'deleted-clone' and m['file'] == filename,
-                        on_message=lambda m: self.forget(),
+        def on_response(msg: Dict):
+            if msg['type'] == 'deleted-clone':
+                self.forget()
+            else:  # failed
+                err_dialog = OkDialog(self.delete_image_btn.get_toplevel(),
+                                      header='Delete failed',
+                                      text='Could not delete {}: {}'.format(filename, msg['error']),
+                                      message_type=Gtk.MessageType.ERROR)
+                err_dialog.run()
+                err_dialog.destroy()
+                for btn in self.buttons.get_children():
+                    btn.set_sensitive(True)
+                self.forget_btn.set_tooltip_text(FORGET_TIP)
+                self.rerun_btn.set_tooltip_text(RERUN_TIP)
+                self.delete_image_btn.set_tooltip_text(DELETE_TIP)
+
+        MessageListener(message_predicate=lambda m: m['type'] in ['deleted-clone', 'delete-clone-failed'] and
+                                                    m['file'] == filename,
+                        on_message=lambda m: GLib.idle_add(on_response, m),
                         listen_to=self.core,
                         one_time=True)
 
