@@ -17,6 +17,7 @@ class RunningJob:
         self.fail_message: Dict = None
         self.tenant: GridRowTenant = None
         self.start: datetime = None
+        self.cancelling = False
 
         # row 1
         self.title = Gtk.Label('', xalign=0, visible=True)
@@ -83,7 +84,8 @@ class RunningJob:
 
         elapsed_str = str(round_to_second(datetime.now(timezone.utc) - self.start))
         self.elapsed.value_label.set_text(elapsed_str)
-        self.update_remaining()
+        if not self.cancelling:
+            self.update_remaining()
         return True
 
     def update_remaining(self):
@@ -96,8 +98,10 @@ class RunningJob:
             self.estimated_completion.value_label.set_text(estimated_remaining_str)
             self.estimated_completion.show_all()
 
-    def cancel(self, b):
-        raise Exception('abstract')
+    def cancel(self, *args):
+        self.cancel_btn.set_sensitive(False)
+        self.cancel_btn.set_tooltip_text("Cancelling")
+        self.cancelling = True
 
     def finish(self):
         self.on_finish(self.fail_message or self.last_message)
@@ -111,7 +115,8 @@ class RunningClone(RunningJob):
     def __init__(self, core: ApartCore, on_finish: Callable[[Dict], None]):
         RunningJob.__init__(self, core, on_finish)
 
-    def cancel(self, b):
+    def cancel(self, *args):
+        RunningJob.cancel(self, *args)
         self.core.send('type: cancel-clone\nid: {}'.format(self.last_message['id']))
 
     def handle_message(self, msg: Dict):
@@ -126,7 +131,8 @@ class RunningRestore(RunningJob):
     def __init__(self, core: ApartCore, on_finish: Callable[[Dict], None]):
         RunningJob.__init__(self, core, on_finish)
 
-    def cancel(self, b):
+    def cancel(self, *args):
+        RunningJob.cancel(self, *args)
         self.core.send('type: cancel-restore\nid: {}'.format(self.last_message['id']))
 
     def handle_message(self, msg: Dict):

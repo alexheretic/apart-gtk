@@ -4,7 +4,6 @@ from cloneentry import CloneToImageEntry
 from partinfo import PartitionInfo
 from progress import ProgressAndHistoryView
 from gi.repository import Gtk
-
 from restoreentry import RestoreFromImageEntry
 import settings
 
@@ -13,7 +12,6 @@ class CloneBody(Gtk.Box):
     def __init__(self, core: ApartCore, sources: List[Dict[str, Any]]):
         Gtk.Box.__init__(self)
         self.core = core
-        self.sources = sources
 
         right_panes = Gtk.VPaned(expand=True)
         self.main_view = MainView(core)
@@ -21,32 +19,68 @@ class CloneBody(Gtk.Box):
         right_panes.pack1(self.info_view, shrink=False)
         right_panes.pack2(self.main_view, shrink=False)
 
+        self.side_bar_box = Gtk.EventBox()
+        self.side_bar_box.add(Gtk.StackSidebar(stack=self.info_view))
+        self.side_bar_box.connect('button-press-event', self.side_bar_click)
+
         self.paned = Gtk.Paned(expand=True)
-        self.paned.pack1(Gtk.StackSidebar(stack=self.info_view), shrink=False)
+        self.paned.pack1(self.side_bar_box, shrink=False)
         self.paned.pack2(right_panes, shrink=False)
 
         self.add(self.paned)
+
+    def update_sources(self, sources: List[Dict[str, Any]]):
+        self.info_view.update_sources(sources)
+
+    def side_bar_click(self, *args):
+        self.core.send('type: status-request')
 
 
 class ClonePartInfo(Gtk.Stack):
     def __init__(self, sources: List[Dict[str, Any]], core: ApartCore, main_view: 'MainView'):
         Gtk.Stack.__init__(self)
+        self.core = core
+        self.sources = sources
         self.main_view = main_view
+        self.updating = False
 
+        self.connect('notify::visible-child', self.on_child_change)
+        self.get_style_context().add_class('part-info')
+
+        self.update_sources(sources)
+        self.show_all()
+
+    def on_child_change(self, *args):
+        visible = self.get_visible_child()
+        if visible:
+            self.main_view.new_clone.use_defaults_for(visible)
+            self.main_view.new_restore.use_defaults_for(visible)
+
+    def update_sources(self, sources: List[Dict[str, Any]]):
+        previous_visible = self.get_visible_child_name()
+
+        parts = []
         for source in sources:
             for part in source['parts']:
                 # ignore partitions <= 1 MiB
                 if part['size'] > 1048576:
-                    info = PartitionInfo(part, core, main_view)
-                    self.add_titled(info, name=info.name(), title=info.title())
+                    parts.append(PartitionInfo(part, self.core, self.main_view))
 
-        self.connect('notify::visible-child', self.on_child_change)
-        self.get_style_context().add_class('part-info')
-        self.show_all()
+        names = map(lambda info: info.name(), parts)
+        for child in self.get_children():
+            if self.child_get_property(child, 'name') not in names:
+                child.destroy()
 
-    def on_child_change(self, stack, param):
-        self.main_view.new_clone.use_defaults_for(self.get_visible_child())
-        self.main_view.new_restore.use_defaults_for(self.get_visible_child())
+        for info in parts:
+            existing = self.get_child_by_name(info.name())
+            if not existing or (existing and existing.part != info.part):
+                if existing:
+                    existing.destroy()
+                self.add_titled(info, name=info.name(), title=info.title())
+                info.show_all()
+
+        if previous_visible and self.get_child_by_name(previous_visible):
+            self.set_visible_child_name(previous_visible)
 
 
 class MainView(Gtk.Stack):

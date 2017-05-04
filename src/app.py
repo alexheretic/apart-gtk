@@ -40,11 +40,13 @@ class Window(Gtk.Window):
     def on_status_msg(self, msg: Dict):
         if msg['status'] == 'dying':
             self.on_delete()
-        if msg['status'] == 'started':
+        elif msg['status'] == 'started':
             self.clone_body = CloneBody(self.core, sources=msg['sources'])
             self.remove(self.loading_body)
             self.add(self.clone_body)
             self.clone_body.show_all()
+        elif self.clone_body and msg['status'] == 'running':
+            self.clone_body.update_sources(msg['sources'])
 
     def on_delete(self, arg1=None, arg2=None):
         self.status_listener.stop_listening()
@@ -70,6 +72,8 @@ if __name__ == "__main__":
         style_provider,
         Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION
     )
+
+    Gtk.Settings.get_default().set_property("gtk-application-prefer-dark-theme", True)
 
     win.show_all()
     Gtk.main()
