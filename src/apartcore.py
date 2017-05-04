@@ -9,7 +9,7 @@ from typing import *
 from util import default_datetime_to_utc
 
 # True: print out messages <--> core
-LOG_MESSAGES = True
+LOG_MESSAGES = False
 
 
 class MessageListener:
