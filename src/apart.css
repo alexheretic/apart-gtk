@@ -42,9 +42,14 @@
 .finished-jobs separator {
   margin: 6px 0;
 }
+
 .job-stats {
   margin-top: -3px;
 }
+.job-stats spinner {
+  margin-bottom: -3px;
+}
+
 .finished-job-stats {
   margin-top: -3px;
   margin-left: 6px;

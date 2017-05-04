@@ -53,8 +53,10 @@ for loop in range(loops):
 
 print('Total Time: 00:00:58, Ave. Rate:   33.3GB/min, 100.00% completed!', file=sys.stderr)
 print('Syncing... ', file=sys.stderr, end='')
-print('some-data', file=sys.stdout, end='')  # the actual partition data
-sleep(0.01)
+if args.o:
+    sleep(2)  # simulate restore syncing time
+else:
+    print('some-data', file=sys.stdout, end='')  # the actual partition data
 print('OK!', file=sys.stderr)
 
 if args.o:

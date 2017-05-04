@@ -18,6 +18,7 @@ class RunningJob:
         self.tenant: GridRowTenant = None
         self.start: datetime = None
         self.cancelling = False
+        self.syncing: Gtk.Box = None
 
         # row 1
         self.title = Gtk.Label('', xalign=0, visible=True)
@@ -32,6 +33,11 @@ class RunningJob:
         self.elapsed = key_and_val('Elapsed', '')
         self.elapsed.show_all()
         self.estimated_completion = key_and_val('Remaining', '')
+        self.stats = Gtk.Box(visible=True)
+        self.stats.add(self.elapsed)
+        self.stats.add(self.rate)
+        self.stats.add(self.estimated_completion)
+        self.stats.get_style_context().add_class('job-stats')
 
         # row 3
         self.progress_bar = Gtk.ProgressBar(hexpand=True, visible=True)
@@ -49,12 +55,7 @@ class RunningJob:
         tenant.attach(self.title, top=tenant_top)
         tenant.attach(self.cancel_btn, left=1, top=tenant_top)
         tenant.attach(self.progress_bar, top=tenant_top + 1, width=RUNNING_JOB_COLUMNS)
-        box = Gtk.Box(visible=True)
-        box.get_style_context().add_class('job-stats')
-        box.add(self.elapsed)
-        box.add(self.rate)
-        box.add(self.estimated_completion)
-        tenant.attach(box, top=tenant_top + 2, width=RUNNING_JOB_COLUMNS)
+        tenant.attach(self.stats, top=tenant_top + 2, width=RUNNING_JOB_COLUMNS)
 
     def remove_from_grid(self):
         if not self.tenant:
@@ -73,6 +74,16 @@ class RunningJob:
                 self.finish()
             else:
                 self.rate.value_label.set_text(msg.get('rate') or 'Initializing')
+                if not self.syncing and self.last_message.get('syncing'):
+                    self.syncing = Gtk.Box()
+                    label = Gtk.Label("Syncing")
+                    label.get_style_context().add_class('info-key')
+                    label.get_style_context().add_class('dim-label')
+                    self.syncing.add(label)
+                    self.syncing.add(Gtk.Spinner(active=True))
+                    self.syncing.show_all()
+                    self.stats.add(self.syncing)
+                    self.estimated_completion.hide()
 
         elif msg['type'] in ['clone-failed', 'restore-failed']:
             self.fail_message = msg
@@ -84,7 +95,7 @@ class RunningJob:
 
         elapsed_str = str(round_to_second(datetime.now(timezone.utc) - self.start))
         self.elapsed.value_label.set_text(elapsed_str)
-        if not self.cancelling:
+        if not self.cancelling and not self.syncing:
             self.update_remaining()
         return True
 
