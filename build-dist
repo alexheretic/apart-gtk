@@ -8,6 +8,7 @@ rm -rf target
 mkdir -p $DIR/target/lib/apart-gtk/src
 
 echo Build apart-core
+git submodule init
 git submodule update --recursive --remote
 (cd apart-core && rustup run stable cargo build --release)
 cp apart-core/target/release/apart-core target/lib/apart-gtk/
