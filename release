@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+
+set -eu
+dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
+rm -rf $dir/last-release
+mkdir $dir/last-release
+cd $dir/last-release
+
+tagname=$(../src/app.py -v | cut -d ' ' -f 2)  # requires app.py to be runnable, ie dev dependencies
+echo "Release $tagname"
+read -p "continue? [y/N] " -n 1 -r
+echo
+if ! [[ $REPLY =~ ^[^Nn]$ ]]; then
+  exit 0
+fi
+
+git tag -s $tagname -m "Release $tagname"
+git push --tags
+
+curl -OL "https://github.com/alexheretic/apart-gtk/archive/$tagname.tar.gz"
+gpg --armor --detach-sign "$tagname.tar.gz"
+
+sha256sum *tar.gz*
+echo "Pushed tag $tagname to repo, ready to add notes & $tagname.tar.gz.asc file"
+echo "Go to https://github.com/alexheretic/apart-gtk/releases/new?tag=$tagname"
+
+cd $dir
