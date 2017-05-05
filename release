@@ -25,4 +25,7 @@ sha256sum *tar.gz*
 echo "Pushed tag $tagname to repo, ready to add notes & $tagname.tar.gz.asc file"
 echo "Go to https://github.com/alexheretic/apart-gtk/releases/new?tag=$tagname"
 
+nautilus ./
+firefox "https://github.com/alexheretic/apart-gtk/releases/new?tag=$tagname"
+
 cd $dir
