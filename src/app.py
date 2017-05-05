@@ -65,7 +65,7 @@ def main():
     if os.getuid() != 0 and os.environ.get('APART_GTK_NON_ROOT') != 'Y':
         # Normally it only makes sense to run apart->partclone as root
         # Use APART_GTK_NON_ROOT=Y if otherwise
-        print('Root privileges are required', file=sys.stderr)
+        print('Root privileges are required to clone & restore partitions', file=sys.stderr)
         sys.exit(1)
     win = Window()
     win.connect("delete-event", Gtk.main_quit)
