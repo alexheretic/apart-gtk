@@ -53,7 +53,9 @@ class ApartCore(Thread):
         if LOG_MESSAGES:
             self.register(MessageListener(lambda msg: print('apart-core ->\n {}'.format(str(msg)))))
 
-        apart_core_cmd = os.environ.get('APART_GTK_CORE_CMD') or 'apart-core'  # TODO confirm default
+        # Current default is apart-core binary stored in the directory above these sources
+        apart_core_cmd = os.environ.get('APART_GTK_CORE_CMD') or \
+            os.path.dirname(os.path.realpath(__file__)) + '/../apart-core'
         try:
             self.process = subprocess.Popen([apart_core_cmd, self.ipc_address])
         except FileNotFoundError:

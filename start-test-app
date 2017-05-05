@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+
+if [ ! -f apart-core/target/debug/apart-core ]; then
+  (cd apart-core && cargo build)
+fi
+
+RUST_BACKTRACE=1 \
+  APART_GTK_NON_ROOT=Y \
+  APART_PARTCLONE_CMD=/home/alex/project/apart-gtk/test/mockpcl \
+  APART_GTK_CORE_CMD=apart-core/target/debug/apart-core \
+  RUST_LOG=info \
+  APART_LSBLK_CMD=/home/alex/project/apart-gtk/test/mocklsblk \
+  ./src/app.py

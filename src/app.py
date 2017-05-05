@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+import argparse
+
 import gi
 gi.require_version('Gtk', '3.0')  # require version before other importing
 import os
@@ -7,6 +9,9 @@ from apartcore import ApartCore, MessageListener
 from main import CloneBody
 from typing import *
 from gi.repository import GLib, Gtk, Gdk, Gio, GdkPixbuf
+
+
+__version__ = '0.1'
 
 
 class LoadingBody(Gtk.Grid):
@@ -56,7 +61,7 @@ class Window(Gtk.Window):
         self.core.kill()
 
 
-if __name__ == "__main__":
+def main():
     if os.getuid() != 0 and os.environ.get('APART_GTK_NON_ROOT') != 'Y':
         # Normally it only makes sense to run apart->partclone as root
         # Use APART_GTK_NON_ROOT=Y if otherwise
@@ -66,7 +71,7 @@ if __name__ == "__main__":
     win.connect("delete-event", Gtk.main_quit)
 
     style_provider = Gtk.CssProvider()
-    style_provider.load_from_path("src/apart.css")
+    style_provider.load_from_path(os.path.dirname(os.path.realpath(__file__)) + "/apart.css")
     Gtk.StyleContext.add_provider_for_screen(
         Gdk.Screen.get_default(),
         style_provider,
@@ -77,3 +82,11 @@ if __name__ == "__main__":
 
     win.show_all()
     Gtk.main()
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(
+        description='Apart GTK v{} GUI for cloning & restoring partitions'.format(__version__),
+        prog='apart-gtk')
+    parser.add_argument('--version', '-v', action='version', version='%(prog)s v{}'.format(__version__))
+    parser.parse_args()
+    main()

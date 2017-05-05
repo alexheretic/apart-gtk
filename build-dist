@@ -1,0 +1,54 @@
+#!/usr/bin/env bash
+## requires python-pip & python-wheel
+set -eu
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
+cd $DIR
+rm -rf target
+mkdir -p $DIR/target/lib/apart-gtk/src
+
+echo Build apart-core
+git submodule update --recursive --remote
+(cd apart-core && rustup run stable cargo build --release)
+cp apart-core/target/release/apart-core target/lib/apart-gtk/
+
+
+echo 'Pack dependiencies'
+cd $DIR/target/lib/apart-gtk/src
+pip wheel -r $DIR/dev-requirements.txt
+wheel unpack humanize-*.whl
+mv humanize-*/humanize ./
+rm -rf humanize-*
+
+pip wheel pyzmq
+wheel unpack pyzmq-*.whl
+mv pyzmq-*/zmq ./
+rm -rf pyzmq-*
+
+pip wheel PyYAML
+wheel unpack PyYAML-*.whl
+mv PyYAML-*/yaml ./
+rm -rf PyYAML-*
+
+
+echo 'Copy & compile sources'
+cp -r $DIR/src/* ./
+python -m compileall ./
+
+
+echo 'Copy misc & icons'
+cd $DIR/target
+mkdir -p share/applications
+cp $DIR/misc/apart.desktop share/applications/
+mkdir -p share/icons/hicolor/scalable/apps/
+cp $DIR/icon/apart.svg share/icons/hicolor/scalable/apps/
+mkdir -p share/icons/hicolor/48x48/apps/
+cp $DIR/icon/apart.png share/icons/hicolor/48x48/apps/
+mkdir -p share/polkit-1/actions
+cp $DIR/misc/apart.policy share/polkit-1/actions/
+mkdir -p bin
+cp $DIR/misc/apart-gtk-polkit bin/
+ln -s ../lib/apart-gtk/src/app.py bin/apart-gtk
+
+
+tree -L 3 $DIR/target
