@@ -40,7 +40,7 @@ An install looks like the following,after running `./build-dist` copy from ./tar
 │     ...
 │     └─ python files & dependencies
 └─ share
-   ├─ applications/apart.desktop
+   ├─ applications/apart-gtk.desktop
    ├─ icons/hicolor/scalable/apps/apart.svg
    ├─ icons/hicolor/48x48/apps/apart.png
    └─ polkit-1/actions/com.github.alexheretic.pkexec.apart-gtk.policy
