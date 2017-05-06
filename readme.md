@@ -4,6 +4,9 @@ Linux GUI for cloning disk partitions to images using the GTK toolkit.
 
 ![Usage](apart-gtk-usage.gif?raw=true "Usage")
 
+## Install
+Available on the [Arch Linux AUR](https://aur.archlinux.org/packages/apart-gtk), working on other package formats.
+
 ## Dependencies
 * python-gobject (ie GTK3)
 * apart-core
