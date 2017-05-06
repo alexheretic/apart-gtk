@@ -25,15 +25,14 @@ partclone & partition info mocked. This is useful for GUI development, as you ca
 data risk
 
 ## Build
-Run `./build-dist`
+Run `./build-dist` to build the distribution files to ./target
 
 ## Install
 Linux install will add the following:
 ```
 /usr
 ├─ bin
-│  ├─ apart-gtk
-│  └─ apart-gtk-polkit
+│  └─ apart-gtk
 ├─ lib/apart-gtk
 │  ├─ apart-core
 │  └─ src
@@ -44,5 +43,5 @@ Linux install will add the following:
    ├─ applications/apart.desktop
    ├─ icons/hicolor/scalable/apps/apart.svg
    ├─ icons/hicolor/48x48/apps/apart.png
-   └─ polkit-1/actions/apart.policy
+   └─ polkit-1/actions/com.github.alexheretic.pkexec.apart-gtk.policy
 ```
