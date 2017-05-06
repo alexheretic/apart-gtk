@@ -19,12 +19,13 @@ git tag -s $tagname -m "Release $tagname"
 git push --tags
 
 curl -OL "https://github.com/alexheretic/apart-gtk/archive/$tagname.tar.gz"
-gpg --armor --detach-sign "$tagname.tar.gz"
+# gpg --armor --detach-sign "$tagname.tar.gz"
 
 sha256sum *tar.gz*
-echo "Pushed tag $tagname to repo, ready to add notes & $tagname.tar.gz.asc file"
+echo "Pushed tag $tagname to repo, ready to add notes"
 echo "Go to https://github.com/alexheretic/apart-gtk/releases/new?tag=$tagname"
 
-nautilus ./
+# nautilus ./
+xdg-open "https://github.com/alexheretic/apart-gtk/releases/new?tag=$tagname"
 
 cd $dir
