@@ -3,7 +3,7 @@
  "-//freedesktop//DTD PolicyKit Policy Configuration 1.0//EN"
  "http://www.freedesktop.org/standards/PolicyKit/1/policyconfig.dtd">
 <policyconfig>
-  <action id="apart">
+  <action id="com.github.alexheretic.pkexec.apart-gtk">
     <message>Authentication is required to run Apart</message>
     <icon_name>apart-gtk</icon_name>
     <defaults>
@@ -11,7 +11,6 @@
       <allow_inactive>auth_admin</allow_inactive>
       <allow_active>auth_admin</allow_active>
     </defaults>
-    <annotate key="org.freedesktop.policykit.exec.path">/usr/bin/apart-gtk</annotate>
-    <annotate key="org.freedesktop.policykit.exec.allow_gui">true</annotate>
+    <annotate key="org.freedesktop.policykit.exec.path">/usr/lib/apart-gtk/apart-core</annotate>
   </action>
 </policyconfig>

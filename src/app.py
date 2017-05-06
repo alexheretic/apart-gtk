@@ -12,7 +12,7 @@ from gi.repository import GLib, Gtk, Gdk, Gio, GdkPixbuf
 
 
 # App versions, "major.minor", major => new stuff, minor => fixes
-__version__ = '0.2'
+__version__ = '0.3'
 
 
 class LoadingBody(Gtk.Grid):
@@ -63,11 +63,6 @@ class Window(Gtk.Window):
 
 
 def main():
-    if os.getuid() != 0 and os.environ.get('APART_GTK_NON_ROOT') != 'Y':
-        # Normally it only makes sense to run apart->partclone as root
-        # Use APART_GTK_NON_ROOT=Y if otherwise
-        print('Root privileges are required to clone & restore partitions', file=sys.stderr)
-        sys.exit(1)
     win = Window()
     win.connect("delete-event", Gtk.main_quit)
 

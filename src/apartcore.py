@@ -56,10 +56,17 @@ class ApartCore(Thread):
         # Current default is apart-core binary stored in the directory above these sources
         apart_core_cmd = os.environ.get('APART_GTK_CORE_CMD') or \
             os.path.dirname(os.path.realpath(__file__)) + '/../apart-core'
+
         try:
-            self.process = subprocess.Popen([apart_core_cmd, self.ipc_address])
+            if os.geteuid() == 0:
+                self.process = subprocess.Popen([apart_core_cmd, self.ipc_address])
+            else:
+                self.process = subprocess.Popen(['pkexec', apart_core_cmd, self.ipc_address])
         except FileNotFoundError:
-            sys.stderr.write('apart-core command not found at \'' + apart_core_cmd + '\'')
+            if os.geteuid() == 0:
+                print('apart-core command not found at \'' + apart_core_cmd + '\'', file=sys.stderr)
+            else:
+                print('pkexec command not found, install polkit or run as root', file=sys.stderr)
             self.zmq_context.destroy()
             sys.exit(1)
 

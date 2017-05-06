@@ -15,6 +15,7 @@ if [[ $(rustup toolchain list | grep -c stable) -eq 0 ]]; then
 fi
 cd $DIR/target
 curl -o core.tar.gz -L https://github.com/alexheretic/apart-core/archive/v$APART_CORE_VERSION.tar.gz
+echo '82fa2c04808c3f5e2caf1cf22b20797ba2d9510e2fa3f96cfabfdc0e3fee9f83 core.tar.gz' | sha256sum -c
 tar xf core.tar.gz
 (cd apart-core-$APART_CORE_VERSION && rustup run stable cargo build --release)
 cp apart-core-$APART_CORE_VERSION/target/release/apart-core lib/apart-gtk/
@@ -54,9 +55,8 @@ cp $DIR/icon/apart.svg share/icons/hicolor/scalable/apps/
 mkdir -p share/icons/hicolor/48x48/apps/
 cp $DIR/icon/apart.png share/icons/hicolor/48x48/apps/
 mkdir -p share/polkit-1/actions
-cp $DIR/misc/apart.policy share/polkit-1/actions/
+cp $DIR/misc/*.policy share/polkit-1/actions/
 mkdir -p bin
-cp $DIR/misc/apart-gtk-polkit bin/
 ln -s ../lib/apart-gtk/src/app.py bin/apart-gtk
 
 

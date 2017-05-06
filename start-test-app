@@ -1,13 +1,15 @@
 #!/usr/bin/env bash
 
-if [ ! -f apart-core/target/debug/apart-core ]; then
-  (cd apart-core && cargo build)
+set -eu
+dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
+if [ ! -f $dir/apart-core/target/debug/apart-core ]; then
+  (cd $dir/apart-core && cargo build)
 fi
 
 RUST_BACKTRACE=1 \
-  APART_GTK_NON_ROOT=Y \
-  APART_PARTCLONE_CMD=/home/alex/project/apart-gtk/test/mockpcl \
-  APART_GTK_CORE_CMD=apart-core/target/debug/apart-core \
+  APART_PARTCLONE_CMD=$dir/test/mockpcl \
+  APART_GTK_CORE_CMD=$dir/apart-core/target/debug/apart-core \
   RUST_LOG=info \
-  APART_LSBLK_CMD=/home/alex/project/apart-gtk/test/mocklsblk \
-  ./src/app.py
+  APART_LSBLK_CMD=$dir/test/mocklsblk \
+  $dir/src/app.py

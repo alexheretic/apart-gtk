@@ -26,7 +26,7 @@ print('File system:  raw', file=sys.stderr)
 print('Device size:   32.2 GB = 62914560 Blocks', file=sys.stderr)
 print('Space in use:  32.2 GB = 62914560 Blocks', file=sys.stderr)
 print('Free Space:     0 Byte = 0 Blocks', file=sys.stderr)
-print('Block size:   512 Byte', file=sys.stderr)
+print('Block size:   512 Byte', file=sys.stderr, flush=True)
 
 
 def print_progress(remaining: timedelta, complete: float, rate: str):
@@ -35,11 +35,7 @@ def print_progress(remaining: timedelta, complete: float, rate: str):
                                                                                                           rate=rate),
           file=sys.stderr)
     print(r'current block:    3878912, total block:   62914560, Complete:   {complete:.2f}'.format(complete=complete),
-          file=sys.stderr)
-
-# def print_move_term_up2():
-#     print(r'\033[2A', file=sys.stderr, end='')
-
+          file=sys.stderr, flush=True)
 
 for loop in range(loops):
     remaining_secs = loops - loop - 1
@@ -52,7 +48,7 @@ for loop in range(loops):
         sleep(1)
 
 print('Total Time: 00:00:58, Ave. Rate:   33.3GB/min, 100.00% completed!', file=sys.stderr)
-print('Syncing... ', file=sys.stderr, end='')
+print('Syncing... ', file=sys.stderr, end='', flush=True)
 if args.o:
     sleep(2)  # simulate restore syncing time
 else:
