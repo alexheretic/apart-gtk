@@ -3,7 +3,7 @@
  "-//freedesktop//DTD PolicyKit Policy Configuration 1.0//EN"
  "http://www.freedesktop.org/standards/PolicyKit/1/policyconfig.dtd">
 <policyconfig>
-  <action id="org.archlinux.pkexec.gparted">
+  <action id="apart">
     <message>Authentication is required to run Apart</message>
     <icon_name>apart-gtk</icon_name>
     <defaults>
