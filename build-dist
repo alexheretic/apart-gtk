@@ -10,6 +10,9 @@ rm -rf target
 mkdir -p $DIR/target/lib/apart-gtk/src
 
 echo Build apart-core
+if [[ $(rustup toolchain list | grep -c stable) -eq 0 ]]; then
+  rustup install stable
+fi
 cd $DIR/target
 curl -o core.tar.gz -L https://github.com/alexheretic/apart-core/archive/v$APART_CORE_VERSION.tar.gz
 tar xf core.tar.gz
