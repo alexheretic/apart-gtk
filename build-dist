@@ -49,7 +49,7 @@ python -m compileall ./
 echo 'Copy misc & icons'
 cd $DIR/target
 mkdir -p share/applications
-cp $DIR/misc/apart.desktop share/applications/
+cp $DIR/misc/*.desktop share/applications/
 mkdir -p share/icons/hicolor/scalable/apps/
 cp $DIR/icon/apart.svg share/icons/hicolor/scalable/apps/
 mkdir -p share/icons/hicolor/48x48/apps/
