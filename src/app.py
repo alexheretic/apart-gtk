@@ -11,7 +11,8 @@ from typing import *
 from gi.repository import GLib, Gtk, Gdk, Gio, GdkPixbuf
 
 
-__version__ = '0.1'
+# App versions, "major.minor", major => new stuff, minor => fixes
+__version__ = '0.2'
 
 
 class LoadingBody(Gtk.Grid):
