@@ -2,6 +2,8 @@ Apart GTK
 =========
 Linux GUI for cloning disk partitions to images using the GTK toolkit.
 
+![Usage](apart-gtk-usage.gif?raw=true "Usage")
+
 ## Dependencies
 * python-gobject (ie GTK3)
 * apart-core
