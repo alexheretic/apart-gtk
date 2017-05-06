@@ -58,7 +58,7 @@ class ApartCore(Thread):
             os.path.abspath(os.path.dirname(os.path.realpath(__file__)) + '/../apart-core')
 
         try:
-            if os.geteuid() == 0:
+            if os.geteuid() == 0 or os.environ.get('APART_GTK_CORE_CMD'):
                 self.process = subprocess.Popen([apart_core_cmd, self.ipc_address])
             else:
                 self.process = subprocess.Popen(['pkexec', apart_core_cmd, self.ipc_address])
