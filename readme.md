@@ -27,8 +27,8 @@ data risk
 ## Build
 Run `./build-dist` to build the distribution files to ./target
 
-## Install
-Linux install will add the following:
+## Manual Install
+An install looks like the following,after running `./build-dist` copy from ./target to /usr
 ```
 /usr
 ├─ bin
