@@ -55,7 +55,7 @@ class ApartCore(Thread):
 
         # Current default is apart-core binary stored in the directory above these sources
         apart_core_cmd = os.environ.get('APART_GTK_CORE_CMD') or \
-            os.path.dirname(os.path.realpath(__file__)) + '/../apart-core'
+            os.path.abspath(os.path.dirname(os.path.realpath(__file__)) + '/../apart-core')
 
         try:
             if os.geteuid() == 0:
