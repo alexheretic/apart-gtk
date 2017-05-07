@@ -8,6 +8,12 @@ mkdir $dir/last-release
 cd $dir/last-release
 
 tagname=$(../src/app.py -v | cut -d ' ' -f 2)  # requires app.py to be runnable, ie dev dependencies
+if git rev-parse $tagname >/dev/null 2>&1
+then
+  echo "tag $tagname already exists" >&2
+  exit 1
+fi
+
 echo "Release $tagname"
 read -p "continue? [y/N] " -n 1 -r
 echo
@@ -26,6 +32,6 @@ echo "Pushed tag $tagname to repo, ready to add notes"
 echo "Go to https://github.com/alexheretic/apart-gtk/releases/new?tag=$tagname"
 
 # nautilus ./
-xdg-open "https://github.com/alexheretic/apart-gtk/releases/new?tag=$tagname"
+gio open "https://github.com/alexheretic/apart-gtk/releases/new?tag=$tagname"
 
 cd $dir
