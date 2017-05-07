@@ -14,15 +14,14 @@ Available on the [Arch Linux AUR](https://aur.archlinux.org/packages/apart-gtk),
   * partclone
   * pigz
 
-## Dev Dependencies
-See dev-requirements.txt for python requirements, these can be installed with `pip install -r dev-requirements.txt` or similar.
+## Additional Python Dependencies
+See dev-requirements.txt for python requirements, these can be installed with `pip install -r dev-requirements.txt` or similar. These can be bundled with the app, see *Build*.
 
 The apart-core project is written in Rust, so will require rustup and uses cargo to build.
 
 ## Run in test mode
 With the dev dependencies installed run `./start-test-app` to run from src/ a version of the code with
-partclone & partition info mocked. This is useful for GUI development, as you can clone and restore without actual
-data risk
+partclone & partition info mocked. This is useful for GUI development, as you can clone and restore without data risk.
 
 ## Build
 Run `./build-dist` to build the distribution files to ./target. Optionally `./build-dist --no-python-deps` can be called to skip the python dependency bundling.
