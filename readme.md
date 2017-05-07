@@ -9,6 +9,7 @@ Available on the [Arch Linux AUR](https://aur.archlinux.org/packages/apart-gtk),
 
 ## Dependencies
 * python-gobject (ie GTK3)
+* polkit - for non-root usage
 * apart-core
   * zeromq
   * partclone
