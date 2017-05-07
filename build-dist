@@ -1,9 +1,17 @@
 #!/usr/bin/env bash
 
-## requires python-pip & python-wheel
+## requires python-pip & python-wheel unless --no-python-deps
 set -eu
 APART_CORE_VERSION="0.1.0"
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
+pack_dependencies=true
+for arg in "$@"; do
+  if [ "$arg" == '--no-python-deps' ]; then
+    pack_dependencies=false
+    echo 'Skipping python dependency inclusion'
+  fi
+done
 
 cd $DIR
 rm -rf target
@@ -22,26 +30,27 @@ cp apart-core-$APART_CORE_VERSION/target/release/apart-core lib/apart-gtk/
 rm core.tar.gz
 rm -rf apart-core-$APART_CORE_VERSION
 
+if $pack_dependencies ; then
+  echo 'Pack dependiencies'
+  cd $DIR/target/lib/apart-gtk/src
+  pip wheel -r $DIR/dev-requirements.txt
+  wheel unpack humanize-*.whl
+  mv humanize-*/humanize ./
+  rm -rf humanize-*
 
-echo 'Pack dependiencies'
-cd $DIR/target/lib/apart-gtk/src
-pip wheel -r $DIR/dev-requirements.txt
-wheel unpack humanize-*.whl
-mv humanize-*/humanize ./
-rm -rf humanize-*
+  pip wheel pyzmq
+  wheel unpack pyzmq-*.whl
+  mv pyzmq-*/zmq ./
+  rm -rf pyzmq-*
 
-pip wheel pyzmq
-wheel unpack pyzmq-*.whl
-mv pyzmq-*/zmq ./
-rm -rf pyzmq-*
-
-pip wheel PyYAML
-wheel unpack PyYAML-*.whl
-mv PyYAML-*/yaml ./
-rm -rf PyYAML-*
-
+  pip wheel PyYAML
+  wheel unpack PyYAML-*.whl
+  mv PyYAML-*/yaml ./
+  rm -rf PyYAML-*
+fi
 
 echo 'Copy & compile sources'
+cd $DIR/target/lib/apart-gtk/src
 cp -r $DIR/src/* ./
 python -m compileall ./
 
