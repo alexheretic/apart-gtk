@@ -66,10 +66,12 @@ class ClonePartInfo(Gtk.Stack):
                 if part['size'] > 1048576:
                     parts.append(PartitionInfo(part, self.core, self.main_view))
 
-        names = map(lambda info: info.name(), parts)
+        changed_partition_info = False
+        names = list(map(lambda p: p.name(), parts))
         for child in self.get_children():
             if self.child_get_property(child, 'name') not in names:
                 child.destroy()
+                changed_partition_info = True
 
         for info in parts:
             existing = self.get_child_by_name(info.name())
@@ -78,8 +80,9 @@ class ClonePartInfo(Gtk.Stack):
                     existing.destroy()
                 self.add_titled(info, name=info.name(), title=info.title())
                 info.show_all()
+                changed_partition_info = True
 
-        if previous_visible and self.get_child_by_name(previous_visible):
+        if changed_partition_info and previous_visible and self.get_child_by_name(previous_visible):
             self.set_visible_child_name(previous_visible)
 
 

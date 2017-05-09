@@ -64,3 +64,12 @@
 .job-buttons button:last-child {
   margin-right: 0;
 }
+
+.finish-label {
+   padding: 0 1em;
+}
+
+.job-name {
+  margin: 0 1ex;
+  font-style: italic;
+}

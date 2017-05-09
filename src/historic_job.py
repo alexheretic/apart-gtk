@@ -42,10 +42,24 @@ class FinishedJob:
         self.duration = key_and_val(DURATION_KEY, str(round_to_second(self.msg['finish'] - self.msg['start'])))
 
         self.icon = Gtk.Image.new_from_icon_name(icon_name, Gtk.IconSize.LARGE_TOOLBAR)
-        self.title_label = Gtk.Label(self.purpose(), xalign=0)
+        title_source = Gtk.Label('', xalign=0)
+        title_name = Gtk.Label('', xalign=0)
+        title_destination = Gtk.Label('', xalign=0)
+
+        if final_message['type'].startswith('clone'):
+            title_source.set_text(rm_dev(self.msg['source']))
+            title_name.set_text(extract_name(self.msg['destination']))
+            title_name.get_style_context().add_class("job-name")
+            title_destination.set_text('-> ' + extract_directory(self.msg['destination']))
+        else:
+            title_source.set_text(extract_filename(self.msg['source']))
+            title_destination.set_text(' -> ' + rm_dev(self.msg['destination']))
+
         self.title_inner_box = Gtk.Box(hexpand=True)
         self.title_inner_box.add(self.icon)
-        self.title_inner_box.add(self.title_label)
+        self.title_inner_box.add(title_source)
+        self.title_inner_box.add(title_name)
+        self.title_inner_box.add(title_destination)
         self.title_inner_box.get_style_context().add_class('finished-job-title')
         self.title_inner_box.show_all()
         self.title_box = Gtk.EventBox(visible=True)
@@ -245,7 +259,7 @@ class FailedRestore(FinishedJob):
     def __init__(self, final_message: Dict, progress_view: 'ProgressAndHistoryView', core: ApartCore):
         FinishedJob.__init__(self, final_message, progress_view, core, icon_name='dialog-error')
         self.fail_reason = key_and_val('Failed', self.msg['error'])
-        self.image_source = key_and_val('Restoring from', extract_filename(self.msg['source']))
+        self.image_source = key_and_val('Restoring from', self.msg['source'])
         self.stats = Gtk.VBox()
         for stat in [self.fail_reason, self.image_source, self.duration]:
             self.stats.add(stat)
@@ -278,7 +292,7 @@ class SuccessfulRestore(FinishedJob):
         FinishedJob.__init__(self, final_message, progress_view, core, icon_name='object-select-symbolic',
                              forget_on_rerun=False)
         self.stats = Gtk.VBox()
-        self.image_source = key_and_val('Restored from', extract_filename(self.msg['source']))
+        self.image_source = key_and_val('Restored from', self.msg['source'])
         for stat in [self.image_source, self.duration]:
             self.stats.add(stat)
         self.stats.get_style_context().add_class('finished-job-stats')

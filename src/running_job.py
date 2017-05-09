@@ -21,8 +21,13 @@ class RunningJob:
         self.syncing: Gtk.Box = None
 
         # row 1
-        self.title = Gtk.Label('', xalign=0, visible=True)
-        self.title.get_style_context().add_class('job-title')
+        self.title_source = Gtk.Label('', xalign=0, visible=True)
+        self.title_name = Gtk.Label('', xalign=0, visible=True)
+        self.title_dest = Gtk.Label('', xalign=0, visible=True)
+        self.title_box = Gtk.Box(visible=True)
+        self.title_box.add(self.title_source)
+        self.title_box.add(self.title_name)
+        self.title_box.add(self.title_dest)
         self.cancel_btn = Gtk.Button('Cancel', visible=True, halign=Gtk.Align.END)
         self.cancel_btn.get_style_context().add_class('job-cancel-btn')
         self.cancel_btn.connect('clicked', self.cancel)
@@ -52,7 +57,7 @@ class RunningJob:
             tenant.attach(Gtk.Separator(visible=True), width=RUNNING_JOB_COLUMNS)
             tenant_top += 1
 
-        tenant.attach(self.title, top=tenant_top)
+        tenant.attach(self.title_box, top=tenant_top)
         tenant.attach(self.cancel_btn, left=1, top=tenant_top)
         tenant.attach(self.progress_bar, top=tenant_top + 1, width=RUNNING_JOB_COLUMNS)
         tenant.attach(self.stats, top=tenant_top + 2, width=RUNNING_JOB_COLUMNS)
@@ -133,8 +138,10 @@ class RunningClone(RunningJob):
     def handle_message(self, msg: Dict):
         RunningJob.handle_message(self, msg)
         if not self.finished():
-            self.title.set_text('{} -> {}'.format(rm_dev(self.last_message['source']),
-                                                  extract_directory(self.last_message['destination'])))
+            self.title_source.set_text(rm_dev(self.last_message['source']))
+            self.title_name.set_text(extract_name(self.last_message['destination']))
+            self.title_name.get_style_context().add_class("job-name")
+            self.title_dest.set_text('-> ' + extract_directory(self.last_message['destination']))
 
 
 class RunningRestore(RunningJob):
@@ -149,8 +156,8 @@ class RunningRestore(RunningJob):
     def handle_message(self, msg: Dict):
         RunningJob.handle_message(self, msg)
         if not self.finished():
-            self.title.set_text('{} -> {}'.format(self.last_message['source'],
-                                                  rm_dev(self.last_message['destination'])))
+            self.title_source.set_text(extract_filename(self.last_message['source']))
+            self.title_dest.set_text('-> ' + rm_dev(self.last_message['destination']))
 
 
 def create(msg: Dict, core: ApartCore, on_finish: Callable[[Dict], None]) -> RunningJob:
