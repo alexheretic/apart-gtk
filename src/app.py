@@ -12,7 +12,7 @@ from gi.repository import GLib, Gtk, Gdk, Gio, GdkPixbuf
 
 
 # App versions, "major.minor", major => new stuff, minor => fixes
-__version__ = '0.7'
+__version__ = '0.8'
 
 
 class LoadingBody(Gtk.Grid):
