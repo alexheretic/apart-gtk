@@ -51,7 +51,7 @@ class ApartCore(Thread):
         self.socket.setsockopt(zmq.RCVTIMEO, 100)
         self.socket.bind(self.ipc_address)
         self.on_finish = on_finish
-        self.listeners: List[MessageListener] = listeners or []
+        self.listeners = listeners or []  # List[MessageListener]
 
         if LOG_MESSAGES:
             self.register(MessageListener(lambda msg: print('apart-core ->\n {}'.format(str(msg)))))

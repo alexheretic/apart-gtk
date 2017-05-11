@@ -28,7 +28,8 @@ class ProgressAndHistoryView(Gtk.Stack):
         self.running_jobs_label.get_style_context().add_class('section-title')
         self.content.add(self.running_jobs_label)
 
-        self.running_jobs: Dict[str, RunningJob] = {}
+        # self.running_jobs: Dict[str, RunningJob] = {} <- not compatiable with 3.5
+        self.running_jobs = {}
         self.running_jobs_grid = Gtk.Grid(orientation=Gtk.Orientation.VERTICAL,
                                           column_spacing=6,
                                           row_spacing=6)
@@ -36,7 +37,8 @@ class ProgressAndHistoryView(Gtk.Stack):
         self.running_jobs_grid.get_style_context().add_class('jobs')
         self.content.add(self.running_jobs_grid)
 
-        self.finished_jobs: Dict[str, FinishedJob] = {}
+        # self.finished_jobs: Dict[str, FinishedJob] = {} <- not compatiable with 3.5
+        self.finished_jobs = {}
         self.finished_jobs_label = Gtk.Label('History', halign=Gtk.Align.START)
         self.finished_jobs_label.get_style_context().add_class('section-title')
         self.content.add(self.finished_jobs_label)

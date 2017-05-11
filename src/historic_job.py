@@ -37,7 +37,7 @@ class FinishedJob:
         self.progress_view = progress_view
         self.tenant = None
         self.forget_on_rerun = forget_on_rerun
-        self.extra_user_state: RevealState = None
+        self.extra_user_state = None  # RevealState
 
         self.duration = key_and_val(DURATION_KEY, str(round_to_second(self.msg['finish'] - self.msg['start'])))
 
@@ -210,7 +210,7 @@ class SuccessfulClone(FinishedJob):
 
     def similar_to(self, other: FinishedJob) -> bool:
         """
-        As successful clones indicate space being taken up on the file system, it should only be lost from the history 
+        As successful clones indicate space being taken up on the file system, it should only be lost from the history
         if another task overwrote the same file (which as it includes at to-minute timestamp should be rare)
         """
         return FinishedJob.similar_to(self, other) and self.msg['destination'] == other.msg['destination']

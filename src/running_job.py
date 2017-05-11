@@ -13,12 +13,12 @@ class RunningJob:
         """:param on_finish: called when job has received it's final message, with the this message as an arg"""
         self.core = core
         self.on_finish = on_finish
-        self.last_message: Dict = None
-        self.fail_message: Dict = None
-        self.tenant: GridRowTenant = None
-        self.start: datetime = None
+        self.last_message = None  # Dict
+        self.fail_message = None  # Dict
+        self.tenant  = None  # GridRowTenant
+        self.start  = None  # datetime
         self.cancelling = False
-        self.syncing: Gtk.Box = None
+        self.syncing  = None  # Gtk.Box
 
         # row 1
         self.title_source = Gtk.Label('', xalign=0, visible=True)
