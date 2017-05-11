@@ -32,7 +32,7 @@ class FinishedJob:
                  icon_name: str,
                  forget_on_rerun: bool = True):
         self.msg = final_message
-        self.finish: datetime = self.msg['finish']
+        self.finish = self.msg['finish']  # datetime
         self.core = core
         self.progress_view = progress_view
         self.tenant = None
