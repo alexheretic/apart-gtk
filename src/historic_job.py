@@ -11,7 +11,7 @@ from util import *
 FINISHED_JOB_COLUMNS = 3
 FORGET_TEXT = 'Clear'
 FORGET_TIP = 'Remove from history'
-RERUN_TIP = 'Run Again'
+RERUN_TIP = 'Run again'
 DELETE_TIP = 'Delete image file'
 DURATION_KEY = 'Runtime'
 
