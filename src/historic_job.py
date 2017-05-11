@@ -1,4 +1,4 @@
-from enum import Enum, auto
+from enum import Enum
 from gi.repository import Gtk, GLib
 import humanize
 from apartcore import ApartCore, MessageListener
@@ -17,8 +17,8 @@ DURATION_KEY = 'Runtime'
 
 
 class RevealState(Enum):
-    REVEALED = auto()
-    HIDDEN = auto()
+    REVEALED = 1
+    HIDDEN = 2
 
     @classmethod
     def default(cls) -> 'RevealState':
