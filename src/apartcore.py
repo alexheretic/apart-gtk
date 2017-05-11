@@ -41,13 +41,16 @@ class MessageListener:
 
 
 class ApartCore(Thread):
-    def __init__(self, listeners: List[MessageListener] = None):
+    def __init__(self, listeners: List[MessageListener] = None,
+                 on_finish: Callable[[int], None] = lambda return_code: None):
         """Starts an apart-core command and starts listening for zmq messages on this new thread"""
         Thread.__init__(self, name='apart-core-runner')
         self.ipc_address = 'ipc:///tmp/apart-gtk-{}.ipc'.format(uuid.uuid4())
         self.zmq_context = zmq.Context()
         self.socket = self.zmq_context.socket(zmq.PAIR)
+        self.socket.setsockopt(zmq.RCVTIMEO, 100)
         self.socket.bind(self.ipc_address)
+        self.on_finish = on_finish
         self.listeners: List[MessageListener] = listeners or []
 
         if LOG_MESSAGES:
@@ -69,12 +72,16 @@ class ApartCore(Thread):
                 print('pkexec command not found, install polkit or run as root', file=sys.stderr)
             self.zmq_context.destroy()
             sys.exit(1)
-
         self.start()
 
     def run(self):
         while self.process.returncode is None:
-            msg = yaml.load(self.socket.recv_string())
+            try:
+                msg = yaml.load(self.socket.recv_string())
+            except zmq.error.Again:
+                # no messages received within timeout
+                self.process.poll()
+                continue
             default_datetime_to_utc(msg)
             to_remove = []
             for listener in self.listeners:
@@ -85,7 +92,9 @@ class ApartCore(Thread):
                 listener.stop_listening()
             if msg['type'] == 'status' and msg['status'] == 'dying':
                 break
+            self.process.poll()
         self.zmq_context.destroy()
+        self.on_finish(self.process.returncode)
 
     def kill(self):
         if not self.zmq_context.closed:

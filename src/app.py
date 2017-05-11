@@ -1,24 +1,21 @@
 #!/usr/bin/env python3
 import argparse
-
 import gi
 gi.require_version('Gtk', '3.0')  # require version before other importing
 import os
-import sys
 from apartcore import ApartCore, MessageListener
 from main import CloneBody
 from typing import *
-from gi.repository import GLib, Gtk, Gdk, Gio, GdkPixbuf
-
+from gi.repository import GLib, Gtk, Gdk
 
 # App versions, "major.minor", major => new stuff, minor => fixes
-__version__ = '0.8'
+__version__ = '0.9'
 
 
 class LoadingBody(Gtk.Grid):
     def __init__(self):
         Gtk.Grid.__init__(self)
-        self.spinner = Gtk.Spinner(halign=Gtk.Align.CENTER, valign=Gtk.Align.CENTER)
+        self.spinner = Gtk.Spinner(halign=Gtk.Align.CENTER, valign=Gtk.Align.CENTER, expand=True)
         self.spinner.start()
         self.add(self.spinner)
 
@@ -26,13 +23,14 @@ class LoadingBody(Gtk.Grid):
 class Window(Gtk.Window):
     def __init__(self):
         Gtk.Window.__init__(self, title='apart')
-
+        self.dying = False
         self.status_listener = MessageListener(
             on_message=lambda m: GLib.idle_add(self.on_status_msg, m),
             message_predicate=lambda m: m['type'] == 'status')
-        self.core = ApartCore(listeners=[self.status_listener])
+        self.core = ApartCore(listeners=[self.status_listener],
+                              on_finish=lambda code: GLib.idle_add(self.on_delete))
 
-        self.set_default_size(height=300, width=-1)
+        self.set_default_size(height=300, width=300 * 16/9)
 
         self.loading_body = LoadingBody()
         self.clone_body = None
@@ -55,16 +53,21 @@ class Window(Gtk.Window):
             self.clone_body.update_sources(msg['sources'])
 
     def on_delete(self, arg1=None, arg2=None):
+        if self.dying:
+            return
         self.status_listener.stop_listening()
-        self.remove(self.clone_body)
-        self.clone_body.destroy()
-        self.add(self.loading_body)
+        if self.clone_body:
+            self.remove(self.clone_body)
+            self.clone_body.destroy()
+            self.add(self.loading_body)
         self.core.kill()
+        self.destroy()
+        Gtk.main_quit()
+        self.dying = True
 
 
 def main():
     win = Window()
-    win.connect("delete-event", Gtk.main_quit)
 
     style_provider = Gtk.CssProvider()
     style_provider.load_from_path(os.path.dirname(os.path.realpath(__file__)) + "/apart.css")
