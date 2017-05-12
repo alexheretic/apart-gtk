@@ -53,7 +53,7 @@ fi
 echo 'Copy & compile sources'
 cd $DIR/target/lib/apart-gtk/src
 cp -r $DIR/src/* ./
-python -m compileall ./
+python3 -m compileall ./
 
 
 echo 'Copy misc & icons'
