@@ -1,0 +1,19 @@
+
+PREFIX = /usr
+build_dist_args?=
+
+all:
+	./build-dist $(build_dist_args)
+
+install: target
+	mkdir -p $(DESTDIR)$(PREFIX)
+	cp -R ./target/* $(DESTDIR)$(PREFIX)/
+	gtk-update-icon-cache /usr/share/icons/hicolor/
+
+uninstall:
+	rm -f $(DESTDIR)$(PREFIX)/bin/apart-gtk
+	rm -rf $(DESTDIR)$(PREFIX)/lib/apart-gtk
+	rm -f $(DESTDIR)$(PREFIX)/share/applications/apart-gtk.desktop
+	rm -f $(DESTDIR)$(PREFIX)/share/icons/hicolor/scalable/apps/apart.svg
+	rm -f $(DESTDIR)$(PREFIX)/share/icons/hicolor/48x48/apps/apart.png
+	rm -f $(DESTDIR)$(PREFIX)/share/polkit-1/actions/com.github.alexheretic.pkexec.apart-gtk.policy

@@ -5,3 +5,4 @@ src/__pycache__/
 dist/
 build/
 last-release/
+makefile

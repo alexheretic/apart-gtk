@@ -29,10 +29,12 @@ With the dev dependencies installed run `./start-test-app` to run from src/ a ve
 partclone & partition info mocked. This is useful for GUI development, as you can clone and restore without data risk.
 
 ## Build
-Run `./build-dist` to build the distribution files to ./target. Optionally `./build-dist --no-python-deps` can be called to skip the python dependency bundling.
+Run `./configure`, or `./configure --no-python-deps`, then run `make`
+
+This just uses `./build-dist` to build the distribution files to ./target and compile apart-core.
 
 ## Manual Install
-An install looks like the following,after running `./build-dist` copy from ./target to /usr
+If using make run `make install` which copies the build made in ./target to /usr
 ```
 /usr
 ├─ bin
@@ -48,3 +50,5 @@ An install looks like the following,after running `./build-dist` copy from ./tar
    ├─ icons/hicolor/48x48/apps/apart.png
    └─ polkit-1/actions/com.github.alexheretic.pkexec.apart-gtk.policy
 ```
+
+`make uninstall` can be used to remove these files

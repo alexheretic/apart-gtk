@@ -5,7 +5,7 @@
 <policyconfig>
   <action id="com.github.alexheretic.pkexec.apart-gtk">
     <message>Authentication is required to run Apart</message>
-    <icon_name>apart-gtk</icon_name>
+    <icon_name>apart</icon_name>
     <defaults>
       <allow_any>auth_admin</allow_any>
       <allow_inactive>auth_admin</allow_inactive>
