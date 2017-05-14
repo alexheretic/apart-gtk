@@ -34,7 +34,7 @@ command -v pip3 >/dev/null 2>&1 || {
   failed=true
 }
 command -v wheel >/dev/null 2>&1 || {
-  echo >&2 "'wheel' required for build, try: pip install wheel"
+  echo >&2 "'wheel' required for build, try: pip3 install wheel"
   failed=true
 }
 
