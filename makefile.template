@@ -8,7 +8,6 @@ all:
 install: target
 	mkdir -p $(DESTDIR)$(PREFIX)
 	cp -R ./target/* $(DESTDIR)$(PREFIX)/
-	gtk-update-icon-cache /usr/share/icons/hicolor/
 
 uninstall:
 	rm -f $(DESTDIR)$(PREFIX)/bin/apart-gtk
