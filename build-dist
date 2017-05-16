@@ -70,4 +70,4 @@ mkdir -p bin
 ln -s ../lib/apart-gtk/src/app.py bin/apart-gtk
 
 
-tree -L 3 $DIR/target
+command -v tree >/dev/null 2>&1 && tree -L 3 $DIR/target || true
