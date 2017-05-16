@@ -73,3 +73,8 @@
   margin: 0 1ex;
   font-style: italic;
 }
+
+/* enforce sidebar style for themes that lack it, ie ambience */
+.frame row {
+  padding: 10px 4px;
+}
