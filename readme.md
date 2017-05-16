@@ -29,12 +29,10 @@ With the dev dependencies installed run `./start-test-app` to run from src/ a ve
 partclone & partition info mocked. This is useful for GUI development, as you can clone and restore without data risk.
 
 ## Build
-Run `./configure`, or `./configure --no-python-deps`, then run `make`
-
-This just uses `./build-dist` to build the distribution files to ./target and compile apart-core.
+Run `./configure` then `make` having installed the above build dependencies
 
 ## Manual Install
-If using make run `make install` which copies the build made in ./target to /usr
+After building run `make install` which copies the build made in ./target to /usr
 ```
 /usr
 ├─ bin
