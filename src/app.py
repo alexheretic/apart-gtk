@@ -9,7 +9,7 @@ from typing import *
 from gi.repository import GLib, Gtk, Gdk
 
 # App versions, "major.minor", major => new stuff, minor => fixes
-__version__ = '0.9'
+__version__ = '0.10'
 
 
 class LoadingBody(Gtk.Grid):
