@@ -77,8 +77,6 @@ def main():
         Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION
     )
 
-    Gtk.Settings.get_default().set_property("gtk-application-prefer-dark-theme", True)
-
     win.show_all()
     Gtk.main()
 
