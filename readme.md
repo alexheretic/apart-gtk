@@ -8,8 +8,8 @@ Linux GUI for cloning & restoring disk partitions to & from compressed image fil
 Available on the [Arch Linux AUR](https://aur.archlinux.org/packages/apart-gtk), working on other package formats.
 
 ## Dependencies
-* python 3.6
-* python-gobject (ie GTK3)
+* python >= 3.5
+* python-gobject, GTK >= 3.22
 * polkit - for non-root usage
 * apart-core
   * zeromq > 4
@@ -17,12 +17,12 @@ Available on the [Arch Linux AUR](https://aur.archlinux.org/packages/apart-gtk),
   * pigz
 
 ## Additional Python Dependencies
-See dev-requirements.txt for python requirements, these can be installed with `pip install -r dev-requirements.txt` or similar. These can be bundled with the app, see *Build*.
+See dev-requirements.txt for python requirements, these can be installed with `pip3 install -r dev-requirements.txt` or similar. These can be bundled with the app, see *Build*.
 
 The apart-core project is written in Rust, so will require rustup and uses cargo to build.
 
 ## Build in Ubuntu
-Make sure you have Python 3, rustup and `libzmq3-dev`. If you have pip issues try `sudo easy_install3 -U pip`
+To build make sure you have Python 3, rustup and `libzmq3-dev`. If you have pip issues try `sudo easy_install3 -U pip`. To run you'll need to install `apt install policykit-1 partclone pigz`, and python dependencies from above.
 
 ## Run in test mode
 With the dev dependencies installed run `./start-test-app` to run from src/ a version of the code with

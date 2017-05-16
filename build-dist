@@ -6,14 +6,6 @@ APART_CORE_VERSION="0.2.0"
 APART_CORE_SHA256='c244855f3cc8776c50e70de32685fcb9cccb8d235e787ea051af85c8988d2030'
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
-pack_python_dependencies=true
-for arg in "$@"; do
-  if [ "$arg" == '--no-python-deps' ]; then
-    pack_python_dependencies=false
-    echo 'Skipping python dependency inclusion'
-  fi
-done
-
 cd $DIR
 rm -rf target
 mkdir -p $DIR/target/lib/apart-gtk/src
@@ -31,24 +23,6 @@ cp apart-core-$APART_CORE_VERSION/target/release/apart-core lib/apart-gtk/
 rm core.tar.gz
 rm -rf apart-core-$APART_CORE_VERSION
 
-if $pack_python_dependencies ; then
-  echo 'Pack dependiencies'
-  cd $DIR/target/lib/apart-gtk/src
-  pip wheel -r $DIR/dev-requirements.txt
-  wheel unpack humanize-*.whl
-  mv humanize-*/humanize ./
-  rm -rf humanize-*
-
-  pip wheel pyzmq
-  wheel unpack pyzmq-*.whl
-  mv pyzmq-*/zmq ./
-  rm -rf pyzmq-*
-
-  pip wheel PyYAML
-  wheel unpack PyYAML-*.whl
-  mv PyYAML-*/yaml ./
-  rm -rf PyYAML-*
-fi
 
 echo 'Copy & compile sources'
 cd $DIR/target/lib/apart-gtk/src

@@ -3,17 +3,11 @@
 
 set -eu
 PREFIX=/usr
-build_dist_args=''
 while test $# -gt 0; do
   case "$1" in
     --prefix*)
       PREFIX=`echo $1 | sed -e 's/^[^=]*=//g'`
       echo "using prefix $PREFIX"
-      shift
-      ;;
-    --no-python-deps)
-      build_dist_args="--no-python-deps"
-      echo "will skip python dependency bundling"
       shift
       ;;
   esac
@@ -29,16 +23,7 @@ else
   echo >&2 "'rustup' required for build"
   failed=true
 fi
-command -v pip3 >/dev/null 2>&1 || {
-  echo >&2 "'pip3' required for build"
-  failed=true
-}
-command -v wheel >/dev/null 2>&1 || {
-  echo >&2 "'wheel' required for build, try: pip3 install wheel"
-  failed=true
-}
 
 if $failed; then exit 1; fi
 
 sed "s|PREFIX = /usr|PREFIX = $PREFIX|" makefile.template > makefile
-sed -i "s|build_dist_args?=|build_dist_args?=$build_dist_args|" makefile
