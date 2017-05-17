@@ -22,7 +22,7 @@ See dev-requirements.txt for python requirements, these can be installed with `p
 The apart-core project is written in Rust, so will require rustup and uses cargo to build.
 
 ## Build in Ubuntu
-To build make sure you have Python 3, rustup and `libzmq3-dev`. If you have pip issues try `sudo easy_install3 -U pip`. To run you'll need to install `apt install policykit-1 partclone pigz`, and python dependencies from above.
+To build make sure you have Python 3, rustup and `libzmq3-dev`. If you have pip issues try `easy_install3 -U pip`. To run you'll need to install `apt install policykit-1 partclone pigz`, and python dependencies as above.
 
 ## Run in test mode
 With the dev dependencies installed run `./start-test-app` to run from src/ a version of the code with
