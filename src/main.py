@@ -62,8 +62,8 @@ class ClonePartInfo(Gtk.Stack):
         parts = []
         for source in sources:
             for part in source['parts']:
-                # ignore partitions <= 1 MiB
-                if part['size'] > 1048576:
+                # ignore partitions <= 1 MiB & swap
+                if part['size'] > 1048576 and part.get('fstype') != "swap":
                     parts.append(PartitionInfo(part, self.core, self.main_view))
 
         changed_partition_info = False

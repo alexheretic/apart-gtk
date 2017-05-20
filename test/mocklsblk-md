@@ -1,0 +1,42 @@
+#!/usr/bin/env bash
+
+## Assume was called with expected args '-Jbo name,size,fstype,label,mountpoint'
+echo '{
+   "blockdevices": [
+      {"name": "sdd", "size": "3000592982016", "fstype": null, "label": null, "mountpoint": null,
+         "children": [
+            {"name": "sdd1", "size": "3000591450112", "fstype": "linux_raid_member", "label": "mediapc:0", "mountpoint": null,
+               "children": [
+                  {"name": "md0", "size": "6000913416192", "fstype": "ext4", "label": null, "mountpoint": "/mnt/raid"}
+               ]
+            }
+         ]
+      },
+      {"name": "sdb", "size": "3000592982016", "fstype": null, "label": null, "mountpoint": null,
+         "children": [
+            {"name": "sdb1", "size": "3000591450112", "fstype": "linux_raid_member", "label": "mediapc:0", "mountpoint": null,
+               "children": [
+                  {"name": "md0", "size": "6000913416192", "fstype": "ext4", "label": null, "mountpoint": "/mnt/raid"}
+               ]
+            }
+         ]
+      },
+      {"name": "sdc", "size": "3000592982016", "fstype": null, "label": null, "mountpoint": null,
+         "children": [
+            {"name": "sdc1", "size": "3000591450112", "fstype": "linux_raid_member", "label": "mediapc:0", "mountpoint": null,
+               "children": [
+                  {"name": "md0", "size": "6000913416192", "fstype": "ext4", "label": null, "mountpoint": "/mnt/raid"}
+               ]
+            }
+         ]
+      },
+      {"name": "sda", "size": "80026361856", "fstype": null, "label": null, "mountpoint": null,
+         "children": [
+            {"name": "sda2", "size": "2149580800", "fstype": "swap", "label": null, "mountpoint": "[SWAP]"},
+            {"name": "sda5", "size": "12829000192", "fstype": "ext4", "label": null, "mountpoint": "/"},
+            {"name": "sda3", "size": "65046315008", "fstype": "ext4", "label": "home", "mountpoint": "/home"},
+            {"name": "sda1", "size": "1024", "fstype": null, "label": null, "mountpoint": null}
+         ]
+      }
+   ]
+}'
