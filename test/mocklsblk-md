@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+## lsblk output from a md raid env
 
 ## Assume was called with expected args '-Jbo name,size,fstype,label,mountpoint'
 echo '{
