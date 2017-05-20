@@ -10,19 +10,25 @@ Available on the [Arch Linux AUR](https://aur.archlinux.org/packages/apart-gtk),
 ## Dependencies
 * python >= 3.5
 * python-gobject, GTK >= 3.22
+* pyzmq, humanize, pyyaml
 * polkit - for non-root usage
 * apart-core
   * zeromq > 4
   * partclone
   * pigz
 
-## Additional Python Dependencies
-See dev-requirements.txt for python requirements, these can be installed with `pip3 install -r dev-requirements.txt` or similar. These can be bundled with the app, see *Build*.
-
+## Additional Dependencies
+See dev-requirements.txt for python requirements, these can be installed with `pip3 install -r dev-requirements.txt` or similar.
 The apart-core project is written in Rust, so will require rustup and uses cargo to build.
 
-## Build in Ubuntu
+## Build in Arch
+`pacman -Syu --needed python python-gobject python-yaml python-pyzmq python-humanize gtk3 pigz partclone zeromq polkit rustup git`
+
+Follow build steps below.
+
+## Build in Ubuntu >= 17.04
 To build make sure you have Python 3, rustup and `libzmq3-dev`. If you have pip issues try `easy_install3 -U pip`. To run you'll need to install `apt install policykit-1 partclone pigz`, and python dependencies as above.
+Follow build steps below.
 
 ## Run in test mode
 With the dev dependencies installed run `./start-test-app` to run from src/ a version of the code with
