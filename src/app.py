@@ -6,10 +6,11 @@ import os
 from apartcore import ApartCore, MessageListener
 from main import CloneBody
 from typing import *
+from dialog import OkDialog
 from gi.repository import GLib, Gtk, Gdk
 
 # App versions, "major.minor", major => new stuff, minor => fixes
-__version__ = '0.10'
+__version__ = '0.11'
 
 
 class LoadingBody(Gtk.Grid):
@@ -45,10 +46,19 @@ class Window(Gtk.Window):
         if msg['status'] == 'dying':
             self.on_delete()
         elif msg['status'] == 'started':
-            self.clone_body = CloneBody(self.core, sources=msg['sources'])
-            self.remove(self.loading_body)
-            self.add(self.clone_body)
-            self.clone_body.show_all()
+            if msg['sources']:
+                self.clone_body = CloneBody(self.core, sources=msg['sources'])
+                self.remove(self.loading_body)
+                self.add(self.clone_body)
+                self.clone_body.show_all()
+            else:
+                err_dialog = OkDialog(self,
+                                      text='No partitions found',
+                                      ok_button_text='Exit',
+                                      message_type=Gtk.MessageType.ERROR)
+                err_dialog.run()
+                err_dialog.destroy()
+                self.on_delete()
         elif self.clone_body and msg['status'] == 'running':
             self.clone_body.update_sources(msg['sources'])
 
