@@ -1,7 +1,16 @@
 #!/usr/bin/env bash
 
-## requires python-pip & python-wheel unless --no-python-deps
 set -eu
+CARGO_CMD="rustup run stable cargo"
+while test $# -gt 0; do
+  case "$1" in
+    --cargo-cmd*)
+      CARGO_CMD=`echo $1 | sed -e 's/^[^=]*=//g'`
+      shift
+      ;;
+  esac
+done
+
 APART_CORE_VERSION="0.2.0"
 APART_CORE_SHA256='c244855f3cc8776c50e70de32685fcb9cccb8d235e787ea051af85c8988d2030'
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
@@ -11,14 +20,11 @@ rm -rf target
 mkdir -p $DIR/target/lib/apart-gtk/src
 
 echo Build apart-core
-if [[ $(rustup toolchain list | grep -c stable) -eq 0 ]]; then
-  rustup install stable
-fi
 cd $DIR/target
 curl -o core.tar.gz -L https://github.com/alexheretic/apart-core/archive/v$APART_CORE_VERSION.tar.gz
 echo "$APART_CORE_SHA256 core.tar.gz" | sha256sum -c
 tar xf core.tar.gz
-(cd apart-core-$APART_CORE_VERSION && rustup run stable cargo build --release)
+(cd apart-core-$APART_CORE_VERSION && $CARGO_CMD build --release)
 cp apart-core-$APART_CORE_VERSION/target/release/apart-core lib/apart-gtk/
 rm core.tar.gz
 rm -rf apart-core-$APART_CORE_VERSION
