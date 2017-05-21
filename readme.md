@@ -21,18 +21,25 @@ Available on the [Arch Linux AUR](https://aur.archlinux.org/packages/apart-gtk),
 See dev-requirements.txt for python requirements, these can be installed with `pip3 install -r dev-requirements.txt` or similar.
 The apart-core project is written in Rust, so will require rustup and uses cargo to build.
 
-## Build in Arch
+## Build on Arch
 `pacman -Syu --needed python python-gobject python-yaml python-pyzmq python-humanize gtk3 pigz partclone zeromq polkit rustup git`
 
 Follow build steps below.
 
-## Build in Ubuntu >= 17.04
+## Build on Ubuntu >= 17.04
 To build make sure you have Python 3, rustup and `libzmq3-dev`. If you have pip issues try `easy_install3 -U pip`. To run you'll need to install `apt install policykit-1 partclone pigz`, and python dependencies as above.
 Follow build steps below.
 
-## Run in test mode
-With the dev dependencies installed run `./start-test-app` to run from src/ a version of the code with
-partclone & partition info mocked. This is useful for GUI development, as you can clone and restore without data risk.
+## Build on Fedora >= 25
+`dnf install git zeromq-devel rust cargo python3-zmq python3-yaml python3-humanize pigz polkit gtk3`
+
+Install partclone, ie with something like
+```sh
+wget https://forensics.cert.org/fedora/cert/25/x86_64//partclone-0.2.90-1.fc25.x86_64.rpm
+rpm -Uvh partclone-0.2.90-1.fc25.x86_64.rpm
+```
+
+Follow build steps below.
 
 ## Build
 Run `./configure` then `make` having installed the above build dependencies
@@ -56,3 +63,7 @@ After building run `make install` which copies the build made in ./target to /us
 ```
 
 `make uninstall` can be used to remove these files
+
+## Run in test mode
+With the dev dependencies installed run `./start-test-app` to run from src/ a version of the code with
+partclone & partition info mocked. This is useful for GUI development, as you can clone and restore without data risk.
