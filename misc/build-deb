@@ -1,0 +1,60 @@
+#!/usr/bin/env bash
+
+set -eu
+APART_VERSION=""
+APART_SHA256=""
+while test $# -gt 0; do
+  case "$1" in
+    --version*)
+      APART_VERSION=`echo $1 | sed -e 's/^[^=]*=//g'`
+      shift
+      ;;
+    --sha256*)
+      APART_SHA256=`echo $1 | sed -e 's/^[^=]*=//g'`
+      shift
+      ;;
+  esac
+done
+
+if [ -z "$APART_VERSION" ] || [ -z "$APART_SHA256" ]; then
+  echo "Required arguments --version=VERSION --sha256=HASH"
+  exit 1
+fi
+
+apt update
+
+apt install -y ruby-dev build-essential git libzmq3-dev curl pkg-config python3
+
+gem install fpm
+
+curl https://sh.rustup.rs -sSf | sh -s -- --default-toolchain stable -y
+source ~/.cargo/env
+
+echo "Downloading & verifying apart-gtk-v$APART_VERSION ..."
+curl -o apart.tar.gz -L https://github.com/alexheretic/apart-gtk/archive/v$APART_VERSION.tar.gz
+echo "$APART_SHA256 apart.tar.gz" | sha256sum -c
+tar xf apart.tar.gz
+mv apart-gtk-* apart-gtk
+cd apart-gtk
+
+./configure
+make
+mkdir -p /tmp/installdir
+make install DESTDIR=/tmp/installdir
+
+cd /
+
+fpm -s dir -t deb -n apart-gtk -v 0.11 -C /tmp/installdir \
+ -p apart-gtk_VERSION_ARCH.deb \
+ -d policykit-1 \
+ -d "partclone >= 0.2.89" \
+ -d pigz \
+ -d "python3-humanize >= 0.5.1" \
+ -d "python3-zmq >= 16.0.2" \
+ -d "python3-yaml >= 3.12" \
+ -d "libgtk-3-0 >= 3.22" \
+ --license "GPL-3" \
+ -m "Alex Butler <alexheretic@gmail.com>" \
+ --url "https://github.com/alexheretic/apart-gtk" \
+ --description "GUI for cloning & restoring disk partitions to & from compressed image files" \
+ usr/bin usr/lib usr/share

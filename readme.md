@@ -27,7 +27,9 @@ The apart-core project is written in Rust, so will require rustup and uses cargo
 Follow build steps below.
 
 ## Build on Ubuntu >= 17.04
-To build make sure you have Python 3, rustup and `libzmq3-dev`. If you have pip issues try `easy_install3 -U pip`. To run you'll need to install `apt install policykit-1 partclone pigz`, and python dependencies as above.
+Build deps: `apt install build-essential git libzmq3-dev curl pkg-config python3` + `rustup`
+Run deps: `apt install policykit-1 partclone pigz python3-humanize python3-zmq python3-yaml libgtk-3-0`
+
 Follow build steps below.
 
 ## Build on Fedora >= 25
