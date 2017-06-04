@@ -21,10 +21,6 @@ If you have dependency issues, see the build sections for your distro. The GTK 3
   * partclone
   * pigz
 
-## Additional Dependencies
-See dev-requirements.txt for python requirements, these can be installed with `pip3 install -r dev-requirements.txt` or similar.
-The apart-core project is written in Rust, so will require rustup and uses cargo to build.
-
 ## Build on Arch
 `pacman -Syu --needed python python-gobject python-yaml python-pyzmq python-humanize gtk3 pigz partclone zeromq polkit rustup git`
 
