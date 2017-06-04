@@ -25,6 +25,12 @@ class RevealState(Enum):
         return cls.HIDDEN
 
 
+class SourceAvailability(Enum):
+    AVAILABLE = 1
+    GONE = 2
+    MOUNTED = 3
+
+
 class FinishedJob:
     def __init__(self, final_message: Dict,
                  progress_view: 'ProgressAndHistoryView',
@@ -39,7 +45,7 @@ class FinishedJob:
         self.forget_on_rerun = forget_on_rerun
         self.extra_user_state = None  # RevealState
 
-        self.source_available = True  # source (ie /dev/sdX) is available currently
+        self.source_available = SourceAvailability.GONE
 
         self.duration = key_and_val(DURATION_KEY, str(round_to_second(self.msg['finish'] - self.msg['start'])))
 
@@ -136,10 +142,14 @@ class FinishedJob:
             finished_str = humanize.naturaltime(finished_delta)
 
         self.finish_label.set_text(finished_str)
-        self.rerun_btn.set_sensitive(self.source_available)
-        tooltip = RERUN_TIP if self.source_available else rm_dev(self.msg['source']) + " not currently available"
-        self.rerun_btn.set_tooltip_text(tooltip)
 
+        self.rerun_btn.set_sensitive(self.source_available == SourceAvailability.AVAILABLE)
+        tooltip = RERUN_TIP
+        if self.source_available == SourceAvailability.MOUNTED:
+            tooltip = rm_dev(self.msg['source']) + " is currently mounted"
+        elif self.source_available == SourceAvailability.GONE:
+            tooltip = rm_dev(self.msg['source']) + " is not currently available"
+        self.rerun_btn.set_tooltip_text(tooltip)
 
     def forget(self, button=None):
         self.progress_view.forget(self)
@@ -161,10 +171,13 @@ class FinishedJob:
         for disk in sources:
             for part in disk['parts']:
                 if part['name'] == source_part_name:
-                    self.source_available = True
+                    if part['mounted']:
+                        self.source_available = SourceAvailability.MOUNTED
+                    else:
+                        self.source_available = SourceAvailability.AVAILABLE
                     return
 
-        self.source_available = False
+        self.source_available = SourceAvailability.GONE
 
 
 class FailedClone(FinishedJob):
