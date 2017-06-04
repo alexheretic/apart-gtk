@@ -10,7 +10,7 @@ from dialog import OkDialog
 from gi.repository import GLib, Gtk, Gdk
 
 # App versions, "major.minor", major => new stuff, minor => fixes
-__version__ = '0.11'
+__version__ = '0.12'
 
 
 class LoadingBody(Gtk.Grid):
@@ -30,6 +30,8 @@ class Window(Gtk.Window):
             message_predicate=lambda m: m['type'] == 'status')
         self.core = ApartCore(listeners=[self.status_listener],
                               on_finish=lambda code: GLib.idle_add(self.on_delete))
+        self.sources = None
+        self.sources_interest = []  # array of callbacks on sources update
 
         self.set_default_size(height=300, width=300 * 16/9)
 
@@ -42,11 +44,22 @@ class Window(Gtk.Window):
 
         self.set_icon_name('apart')
 
+    def register_interest_in_sources(self, on_update_callback: Callable[[Dict], None]):
+        """
+        Register a callback to be run every time a new sources message is received
+        Note callbacks are run on the GTK main thread
+        Run callback immediately if sources are available
+        """
+        if self.sources:
+            on_update_callback(self.sources)
+        self.sources_interest.append(on_update_callback)
+
     def on_status_msg(self, msg: Dict):
         if msg['status'] == 'dying':
             self.on_delete()
         elif msg['status'] == 'started':
             if msg['sources']:
+                self.sources = msg['sources']
                 self.clone_body = CloneBody(self.core, sources=msg['sources'])
                 self.remove(self.loading_body)
                 self.add(self.clone_body)
@@ -60,9 +73,13 @@ class Window(Gtk.Window):
                 err_dialog.destroy()
                 self.on_delete()
         elif self.clone_body and msg['status'] == 'running':
+            self.sources = msg['sources']
+            # TODO move to sources_interest with a reliable way of getting toplevel
             self.clone_body.update_sources(msg['sources'])
+            for callback in self.sources_interest:
+                callback(self.sources)
 
-    def on_delete(self, arg1=None, arg2=None):
+    def on_delete(self, *args):
         if self.dying:
             return
         self.status_listener.stop_listening()

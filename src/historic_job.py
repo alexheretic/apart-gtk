@@ -39,6 +39,8 @@ class FinishedJob:
         self.forget_on_rerun = forget_on_rerun
         self.extra_user_state = None  # RevealState
 
+        self.source_available = True  # source (ie /dev/sdX) is available currently
+
         self.duration = key_and_val(DURATION_KEY, str(round_to_second(self.msg['finish'] - self.msg['start'])))
 
         self.icon = Gtk.Image.new_from_icon_name(icon_name, Gtk.IconSize.LARGE_TOOLBAR)
@@ -134,6 +136,10 @@ class FinishedJob:
             finished_str = humanize.naturaltime(finished_delta)
 
         self.finish_label.set_text(finished_str)
+        self.rerun_btn.set_sensitive(self.source_available)
+        tooltip = RERUN_TIP if self.source_available else rm_dev(self.msg['source']) + " not currently available"
+        self.rerun_btn.set_tooltip_text(tooltip)
+
 
     def forget(self, button=None):
         self.progress_view.forget(self)
@@ -149,6 +155,16 @@ class FinishedJob:
 
     def add_to_grid(self, grid: Gtk.Grid):
         raise Exception('abstract')
+
+    def on_source_update(self, sources: Dict):
+        source_part_name = rm_dev(self.msg['source'])
+        for disk in sources:
+            for part in disk['parts']:
+                if part['name'] == source_part_name:
+                    self.source_available = True
+                    return
+
+        self.source_available = False
 
 
 class FailedClone(FinishedJob):
@@ -174,6 +190,8 @@ class FailedClone(FinishedJob):
         tenant.attach(self.finish_box, top=base, left=1)
         tenant.attach(self.buttons, top=base, left=2)
         tenant.attach(self.extra, top=base+1, width=FINISHED_JOB_COLUMNS)
+
+        grid.get_toplevel().register_interest_in_sources(on_update_callback=self.on_source_update)
 
 
 class SuccessfulClone(FinishedJob):
@@ -207,6 +225,8 @@ class SuccessfulClone(FinishedJob):
         tenant.attach(self.finish_box, top=base, left=1)
         tenant.attach(self.buttons, top=base, left=2)
         tenant.attach(self.extra, top=base + 1, width=FINISHED_JOB_COLUMNS)
+
+        grid.get_toplevel().register_interest_in_sources(on_update_callback=self.on_source_update)
 
     def similar_to(self, other: FinishedJob) -> bool:
         """
