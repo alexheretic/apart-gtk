@@ -9,7 +9,7 @@ Linux GUI for cloning & restoring disk partitions to & from compressed image fil
 * Ubuntu/Debian: .deb package available [in releases](https://github.com/alexheretic/apart-gtk/releases)
 * Fedora: .rpm package available [in releases](https://github.com/alexheretic/apart-gtk/releases)
 
-I'm working on other package formats.
+If you have dependency issues, see the build sections for your distro. The GTK 3.22 requirement means you'll probably need a >= 2017 distro.
 
 ## Dependencies
 * python >= 3.5
