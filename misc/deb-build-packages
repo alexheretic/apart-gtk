@@ -54,7 +54,7 @@ make install DESTDIR=/tmp/installdir
 
 cd /
 
-fpm -s dir -t deb -n apart-gtk -v 0.11 -C /tmp/installdir \
+fpm -s dir -t deb -n apart-gtk -v $APART_VERSION -C /tmp/installdir \
  -p apart-gtk_VERSION_ARCH.deb \
  -d policykit-1 \
  -d "partclone >= 0.2.89" \
@@ -69,7 +69,7 @@ fpm -s dir -t deb -n apart-gtk -v 0.11 -C /tmp/installdir \
  --description "GUI for cloning & restoring disk partitions to & from compressed image files" \
  usr/bin usr/lib usr/share
 
-fpm -s dir -t rpm -n apart-gtk -v 0.11 -C /tmp/installdir \
+fpm -s dir -t rpm -n apart-gtk -v $APART_VERSION -C /tmp/installdir \
  -p apart-gtk-VERSION-1.ARCH.rpm \
  -d polkit \
  -d "partclone >= 0.2.89" \
