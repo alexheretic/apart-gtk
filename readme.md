@@ -5,7 +5,10 @@ Linux GUI for cloning & restoring disk partitions to & from compressed image fil
 ![Usage](https://raw.githubusercontent.com/alexheretic/apart-gtk/readme-images/apart-gtk-usage.gif?raw=true "Usage")
 
 ## Install
-Available on the [Arch Linux AUR](https://aur.archlinux.org/packages/apart-gtk), working on other package formats.
+* Arch: available on the [AUR](https://aur.archlinux.org/packages/apart-gtk)
+* Ubuntu/Debian: .deb package available [in releases](https://github.com/alexheretic/apart-gtk/releases)
+
+I'm working on other package formats.
 
 ## Dependencies
 * python >= 3.5
