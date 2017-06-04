@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+
+## Run on ubuntu container to cleanup for image creation
+
+apt autoremove -y
+apt autoclean -y
+rm -rf /tmp/installdir
+rm -rf apart.tar.gz
+rm -rf apart-gtk/
+rm -f *.deb
+rm -f *.rpm

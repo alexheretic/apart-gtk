@@ -7,6 +7,7 @@ Linux GUI for cloning & restoring disk partitions to & from compressed image fil
 ## Install
 * Arch: available on the [AUR](https://aur.archlinux.org/packages/apart-gtk)
 * Ubuntu/Debian: .deb package available [in releases](https://github.com/alexheretic/apart-gtk/releases)
+* Fedora: .rpm package available [in releases](https://github.com/alexheretic/apart-gtk/releases)
 
 I'm working on other package formats.
 

@@ -32,7 +32,6 @@ SHA256=$(sha256sum *tar.gz | cut -d ' ' -f 1)
 echo "Pushed tag $tagname to repo, ready to add notes"
 echo "build deb with: misc/docker-build-deb --version=${tagname#?} --sha256=$SHA256"
 
-# nautilus ./
 gio open "https://github.com/alexheretic/apart-gtk/releases/new?tag=$tagname"
 
 cd $dir
