@@ -10,7 +10,7 @@ from dialog import OkDialog
 from gi.repository import GLib, Gtk, Gdk
 
 # App versions, "major.minor", major => new stuff, minor => fixes
-__version__ = '0.12'
+__version__ = '0.13'
 
 
 class LoadingBody(Gtk.Grid):
