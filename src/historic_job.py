@@ -157,9 +157,15 @@ class FinishedJob:
     def rerun(self, button=None):
         backup_dir = extract_directory(self.msg['destination'])
         backup_name = extract_name(self.msg['destination'])
-        self.core.send('type: clone\nsource: {}\ndestination: {}\nname: {}'.format(self.msg['source'],
-                                                                                   backup_dir,
-                                                                                   backup_name))
+        z_name = extract_compression_option(self.msg['destination'])
+        self.core.send('type: clone\n'
+                       'source: {}\n'
+                       'destination: {}\n'
+                       'name: {}\n'
+                       'compression: {}'.format(self.msg['source'],
+                                                backup_dir,
+                                                backup_name,
+                                                z_name))
         if self.forget_on_rerun:
             self.forget()
 

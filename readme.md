@@ -20,6 +20,8 @@ If you have dependency issues, see the build sections for your distro. The GTK 3
   * zeromq > 4
   * partclone
   * pigz
+  * lz4 *(optional: adds compression option)*
+  * zstd *(optional: adds compression option)*
 
 ## Build on Arch
 `pacman -Syu --needed python python-gobject python-yaml python-pyzmq python-humanize gtk3 pigz partclone zeromq polkit rustup git`

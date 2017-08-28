@@ -10,7 +10,7 @@ from dialog import OkDialog
 from gi.repository import GLib, Gtk, Gdk
 
 # App versions, "major.minor", major => new stuff, minor => fixes
-__version__ = '0.13'
+__version__ = '0.14'
 
 
 class LoadingBody(Gtk.Grid):
@@ -60,7 +60,9 @@ class Window(Gtk.Window):
         elif msg['status'] == 'started':
             if msg['sources']:
                 self.sources = msg['sources']
-                self.clone_body = CloneBody(self.core, sources=msg['sources'])
+                self.clone_body = CloneBody(self.core,
+                                            sources=msg['sources'],
+                                            z_options=msg['compression_options'])
                 self.remove(self.loading_body)
                 self.add(self.clone_body)
                 self.clone_body.show_all()

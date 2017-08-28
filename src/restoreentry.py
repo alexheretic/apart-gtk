@@ -2,13 +2,15 @@ from apartcore import ApartCore
 from dialog import OkCancelDialog
 from partinfo import PartitionInfo
 from gi.repository import Gtk
+from typing import *
 
 
 class RestoreFromImageEntry(Gtk.Box):
-    def __init__(self, main_view: 'MainView', core: ApartCore):
+    def __init__(self, main_view: 'MainView', core: ApartCore, z_options: List[str]):
         Gtk.Box.__init__(self, orientation=Gtk.Orientation.VERTICAL, expand=True, halign=Gtk.Align.CENTER)
         self.main_view = main_view
         self.core = core
+        self.z_options = z_options
 
         self.title = Gtk.Label('', xalign=0.5)
         self.title.get_style_context().add_class('dim-label')
@@ -18,7 +20,8 @@ class RestoreFromImageEntry(Gtk.Box):
         self.image_entry = Gtk.FileChooserButton(title='Select Image File')
         image_file_filter = Gtk.FileFilter()
         image_file_filter.set_name('Apart Image files')
-        image_file_filter.add_pattern('*.apt.*.gz')
+        for z_option in z_options:
+            image_file_filter.add_pattern('*.apt.*.{}'.format(z_option))
         self.image_entry.add_filter(image_file_filter)
         self.image_entry.connect('selection-changed', lambda v: self.on_image_select())
 
@@ -62,8 +65,10 @@ class RestoreFromImageEntry(Gtk.Box):
                 self.start_btn.set_tooltip_text(None)
 
     def update_title(self):
+        z_options = ', '.join(map(lambda z: '.' + z, self.z_options))
+
         if self.last_part_info:
-            self.title.set_text('Image file -> ' + self.last_part_info.dev_name())
+            self.title.set_text('Image file ({}) -> {}'.format(z_options, self.last_part_info.dev_name()))
 
     def user_confirm(self):
         dialog = OkCancelDialog(self.get_toplevel(),

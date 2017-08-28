@@ -59,6 +59,7 @@ fpm -s dir -t deb -n apart-gtk -v $APART_VERSION -C /tmp/installdir \
  -d policykit-1 \
  -d "partclone >= 0.2.89" \
  -d pigz \
+ -d liblz4-tool \
  -d "python3-humanize >= 0.5.1" \
  -d "python3-zmq >= 15.3.0" \
  -d "python3-yaml >= 3.11" \
@@ -74,6 +75,8 @@ fpm -s dir -t rpm -n apart-gtk -v $APART_VERSION -C /tmp/installdir \
  -d polkit \
  -d "partclone >= 0.2.89" \
  -d pigz \
+ -d lz4 \
+ -d "zstd >= 1.2.0" \
  -d "python3-humanize >= 0.5.1" \
  -d "python3-zmq >= 15.3.0" \
  -d "python3-yaml >= 3.11" \

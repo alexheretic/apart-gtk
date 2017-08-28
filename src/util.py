@@ -3,7 +3,7 @@ import re
 from typing import *
 
 filename_re = re.compile(r"/[^/]+$")
-name_re = re.compile(r"^.*/(([^/]+)-\d{4,}-\d\d-\d\dT\d{4}\.apt\..+\..+)$")
+name_re = re.compile(r"^.*/(([^/]+)-\d{4,}-\d\d-\d\dT\d{4}\.apt\..+\.(.+))$")
 source_re = re.compile(r"^/dev/")
 
 
@@ -19,6 +19,11 @@ def extract_filename(path: str) -> str:
 def extract_name(path: str) -> str:
     m = re.fullmatch(name_re, path)
     return m.group(2)
+
+
+def extract_compression_option(path: str) -> str:
+    m = re.fullmatch(name_re, path)
+    return m.group(3)
 
 
 def rm_dev(source: str) -> str:
