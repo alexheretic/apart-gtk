@@ -16,7 +16,7 @@ If you have dependency issues, see the build sections for your distro. The GTK 3
 * python-gobject, GTK >= 3.22
 * pyzmq, humanize, pyyaml
 * polkit - for non-root usage
-* apart-core
+* [apart-core](https://github.com/alexheretic/apart-core)
   * zeromq > 4
   * partclone
   * pigz
