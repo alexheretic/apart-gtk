@@ -19,6 +19,8 @@ build_dist_args=''
 if command -v rustup >/dev/null 2>&1; then
   if [[ $(rustup toolchain list | grep -c stable) -eq 0 ]]; then
     rustup install stable
+  else
+    rustup update stable
   fi
 elif command -v cargo >/dev/null 2>&1; then
   echo 'will use default cargo, as rustup not available'
