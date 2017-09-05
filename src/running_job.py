@@ -4,6 +4,7 @@ from apartcore import ApartCore
 from gtktools import GridRowTenant
 from partinfo import key_and_val
 from util import *
+from typing import *
 
 RUNNING_JOB_COLUMNS = 2
 
@@ -15,10 +16,10 @@ class RunningJob:
         self.on_finish = on_finish
         self.last_message = None  # Dict
         self.fail_message = None  # Dict
-        self.tenant  = None  # GridRowTenant
-        self.start  = None  # datetime
+        self.tenant = None  # GridRowTenant
+        self.start = None  # datetime
         self.cancelling = False
-        self.syncing  = None  # Gtk.Box
+        self.syncing = None  # Gtk.Box
 
         # row 1
         self.title_source = Gtk.Label('', xalign=0, visible=True)
@@ -89,6 +90,8 @@ class RunningJob:
                     self.syncing.show_all()
                     self.stats.add(self.syncing)
                     self.estimated_completion.hide()
+                    if not msg.get('rate'):
+                        self.rate.hide()
 
         elif msg['type'] in ['clone-failed', 'restore-failed']:
             self.fail_message = msg

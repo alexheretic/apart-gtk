@@ -7,6 +7,7 @@ from gtktools import GridRowTenant
 from partinfo import key_and_val
 import settings
 from util import *
+from typing import *
 
 FINISHED_JOB_COLUMNS = 3
 FORGET_TEXT = 'Clear'
@@ -36,10 +37,12 @@ class FinishedJob:
                  progress_view: 'ProgressAndHistoryView',
                  core: ApartCore,
                  icon_name: str,
+                 z_options: List[str],
                  forget_on_rerun: bool = True):
         self.msg = final_message
         self.finish = self.msg['finish']  # datetime
         self.core = core
+        self.z_options = z_options
         self.progress_view = progress_view
         self.tenant = None
         self.forget_on_rerun = forget_on_rerun
@@ -96,6 +99,7 @@ class FinishedJob:
 
         self.extra = Gtk.Revealer(transition_duration=settings.animation_duration_ms(), visible=True)
         self.extra.set_reveal_child(RevealState.default() is RevealState.REVEALED)
+        self.compression_available = extract_compression_option(self.msg['destination']) in z_options
         self.update()
 
     def purpose(self) -> str:
@@ -143,12 +147,15 @@ class FinishedJob:
 
         self.finish_label.set_text(finished_str)
 
-        self.rerun_btn.set_sensitive(self.source_available == SourceAvailability.AVAILABLE)
+        self.rerun_btn.set_sensitive(self.source_available == SourceAvailability.AVAILABLE
+                                     and self.compression_available)
         tooltip = RERUN_TIP
         if self.source_available == SourceAvailability.MOUNTED:
             tooltip = rm_dev(self.msg['source']) + " is currently mounted"
         elif self.source_available == SourceAvailability.GONE:
             tooltip = rm_dev(self.msg['source']) + " is not currently available"
+        elif not self.compression_available:
+            tooltip = extract_compression_option(self.msg['destination']) + ' compression is not installed'
         self.rerun_btn.set_tooltip_text(tooltip)
 
     def forget(self, button=None):
@@ -187,8 +194,12 @@ class FinishedJob:
 
 
 class FailedClone(FinishedJob):
-    def __init__(self, final_message: Dict, progress_view: 'ProgressAndHistoryView', core: ApartCore):
-        FinishedJob.__init__(self, final_message, progress_view, core, icon_name='dialog-error')
+    def __init__(self,
+                 final_message: Dict,
+                 progress_view: 'ProgressAndHistoryView',
+                 core: ApartCore,
+                 z_options: List[str]):
+        FinishedJob.__init__(self, final_message, progress_view, core, icon_name='dialog-error', z_options=z_options)
         self.fail_reason = key_and_val('Failed', self.msg['error'])
         self.stats = Gtk.VBox()
         self.stats.add(self.fail_reason)
@@ -214,9 +225,13 @@ class FailedClone(FinishedJob):
 
 
 class SuccessfulClone(FinishedJob):
-    def __init__(self, final_message: Dict, progress_view: 'ProgressAndHistoryView', core: ApartCore):
+    def __init__(self,
+                 final_message: Dict,
+                 progress_view: 'ProgressAndHistoryView',
+                 core: ApartCore,
+                 z_options: List[str]):
         FinishedJob.__init__(self, final_message, progress_view, core, icon_name='object-select-symbolic',
-                             forget_on_rerun=False)
+                             forget_on_rerun=False, z_options=z_options)
         self.image_size = key_and_val('Image size', humanize.naturalsize(self.msg['image_size'], binary=True))
         self.filename = key_and_val('Image file', extract_filename(self.msg['destination']))
         self.stats = Gtk.VBox()
@@ -295,8 +310,13 @@ class SuccessfulClone(FinishedJob):
 
 
 class FailedRestore(FinishedJob):
-    def __init__(self, final_message: Dict, progress_view: 'ProgressAndHistoryView', core: ApartCore):
-        FinishedJob.__init__(self, final_message, progress_view, core, icon_name='dialog-error')
+    def __init__(self,
+                 final_message:
+                 Dict,
+                 progress_view: 'ProgressAndHistoryView',
+                 core: ApartCore,
+                 z_options: List[str]):
+        FinishedJob.__init__(self, final_message, progress_view, core, icon_name='dialog-error', z_options=z_options)
         self.fail_reason = key_and_val('Failed', self.msg['error'])
         self.image_source = key_and_val('Restoring from', self.msg['source'])
         self.stats = Gtk.VBox()
@@ -327,9 +347,13 @@ class FailedRestore(FinishedJob):
 
 
 class SuccessfulRestore(FinishedJob):
-    def __init__(self, final_message: Dict, progress_view: 'ProgressAndHistoryView', core: ApartCore):
+    def __init__(self,
+                 final_message: Dict,
+                 progress_view: 'ProgressAndHistoryView',
+                 core: ApartCore,
+                 z_options: List[str]):
         FinishedJob.__init__(self, final_message, progress_view, core, icon_name='object-select-symbolic',
-                             forget_on_rerun=False)
+                             forget_on_rerun=False, z_options=z_options)
         self.stats = Gtk.VBox()
         self.image_source = key_and_val('Restored from', self.msg['source'])
         for stat in [self.image_source, self.duration]:
@@ -358,14 +382,17 @@ class SuccessfulRestore(FinishedJob):
         return 'Restored {}'.format(rm_dev(self.msg['destination']))
 
 
-def create(final_message: Dict, progress_view: 'ProgressAndHistoryView', core: ApartCore) -> FinishedJob:
+def create(final_message: Dict,
+           progress_view: 'ProgressAndHistoryView',
+           core: ApartCore,
+           z_options: List[str]) -> FinishedJob:
     msg_type = final_message['type']
     if msg_type == 'clone':
-        return SuccessfulClone(final_message, progress_view=progress_view, core=core)
+        return SuccessfulClone(final_message, progress_view=progress_view, core=core, z_options=z_options)
     elif msg_type == 'clone-failed':
-        return FailedClone(final_message, progress_view=progress_view, core=core)
+        return FailedClone(final_message, progress_view=progress_view, core=core, z_options=z_options)
     elif msg_type == 'restore':
-        return SuccessfulRestore(final_message, progress_view=progress_view, core=core)
+        return SuccessfulRestore(final_message, progress_view=progress_view, core=core, z_options=z_options)
     elif msg_type == 'restore-failed':
-        return FailedRestore(final_message, progress_view=progress_view, core=core)
+        return FailedRestore(final_message, progress_view=progress_view, core=core, z_options=z_options)
     raise Exception('Unknown type: ' + msg_type)

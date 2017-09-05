@@ -12,9 +12,10 @@ log = logging.getLogger('ProgressAndHistoryView')
 
 
 class ProgressAndHistoryView(Gtk.Stack):
-    def __init__(self, core: ApartCore):
+    def __init__(self, core: ApartCore, z_options: List[str]):
         Gtk.Stack.__init__(self)
         self.core = core
+        self.z_options = z_options
         self.get_style_context().add_class('progress-view')
 
         self.nothing_label = Gtk.Label('Select a partition to clone', xalign=0.5, vexpand=True)
@@ -66,7 +67,8 @@ class ProgressAndHistoryView(Gtk.Stack):
             try:
                 self.finished_jobs[historic_job_msg['id']] = historic_job.create(historic_job_msg,
                                                                                  progress_view=self,
-                                                                                 core=self.core)
+                                                                                 core=self.core,
+                                                                                 z_options=self.z_options)
             except KeyError as e:
                 log.warning('Error constructing FinishedJob from historic data ' + str(e))
 
@@ -109,7 +111,7 @@ class ProgressAndHistoryView(Gtk.Stack):
         job = self.running_jobs[job_id]
         job.remove_from_grid()
         del self.running_jobs[job_id]
-        job = historic_job.create(final_msg, progress_view=self, core=self.core)
+        job = historic_job.create(final_msg, progress_view=self, core=self.core, z_options=self.z_options)
         job.reveal_extra()  # show extra details of newest finished job
 
         # remove all and re-add for ordering

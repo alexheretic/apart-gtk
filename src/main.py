@@ -96,7 +96,7 @@ class MainView(Gtk.Stack):
         self.set_transition_duration(settings.animation_duration_ms())
         self.new_clone = CloneToImageEntry(self, core, z_options)
         self.add_named(self.new_clone, name='new-clone')
-        self.progress = ProgressAndHistoryView(core)
+        self.progress = ProgressAndHistoryView(core, z_options)
         self.add_named(self.progress, name='progress')
         self.new_restore = RestoreFromImageEntry(self, core, z_options)
         self.add_named(self.new_restore, name='new-restore')

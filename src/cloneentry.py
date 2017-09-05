@@ -51,8 +51,8 @@ class CloneToImageEntry(Gtk.Box):
         self.z_entry.pack_start(z_renderer, True)
         self.z_entry.add_attribute(z_renderer, 'text', 1)
 
-        if 'zstd' in ordered_z_options:
-            self.z_entry.set_active(ordered_z_options.index('zstd'))
+        if 'zst' in ordered_z_options:
+            self.z_entry.set_active(ordered_z_options.index('zst'))
         elif 'gz' in ordered_z_options:
             self.z_entry.set_active(ordered_z_options.index('gz'))
         elif 'lz4' in ordered_z_options:
@@ -154,4 +154,3 @@ class CloneToImageEntry(Gtk.Box):
             self.start_btn.set_sensitive(True)
         else:
             self.start_btn.set_sensitive(False)
-

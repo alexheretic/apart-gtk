@@ -11,15 +11,15 @@ while test $# -gt 0; do
   esac
 done
 
-APART_CORE_VERSION="0.2.3"
-APART_CORE_SHA256='03d506e81f1f6214d6b1d736af9d6bcd4b01f4766b91e917a33d723b7dad6465'
+APART_CORE_VERSION="0.3.2"
+APART_CORE_SHA256='ccbb3ced1d8cacf943280851e9f08b2768bdf2b1947dcc4675ea49b87feb8094'
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 cd $DIR
 rm -rf target
 mkdir -p $DIR/target/lib/apart-gtk/src
 
-echo Build apart-core
+echo "Building apart-core $APART_CORE_VERSION"
 cd $DIR/target
 curl -o core.tar.gz -L https://github.com/alexheretic/apart-core/archive/v$APART_CORE_VERSION.tar.gz
 echo "$APART_CORE_SHA256 core.tar.gz" | sha256sum -c

@@ -22,6 +22,8 @@ class RestoreFromImageEntry(Gtk.Box):
         image_file_filter.set_name('Apart Image files')
         for z_option in z_options:
             image_file_filter.add_pattern('*.apt.*.{}'.format(z_option))
+            if z_option == 'zst':  # also support .zstd from v0.14
+                image_file_filter.add_pattern('*.apt.*.zstd')
         self.image_entry.add_filter(image_file_filter)
         self.image_entry.connect('selection-changed', lambda v: self.on_image_select())
 
