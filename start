@@ -5,8 +5,10 @@ dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 (cd $dir/apart-core && cargo build)
 
-if [ -f ~/.config/apart-gtk/history.yaml ]; then
-  cp ~/.config/apart-gtk/history.yaml $dir/history.yaml.backup
+now=$(date +%Y-%m-%dT%H)
+if [ -f ~/.config/apart-gtk/history.yaml ] && [ ! -f $dir/history-backup-$now.yaml ]; then
+  echo "Backing up ~/.config/apart-gtk/history.yaml -> history-backup-$now.yaml"
+  cp ~/.config/apart-gtk/history.yaml $dir/history-backup-$now.yaml
 fi
 
 RUST_BACKTRACE=full \
