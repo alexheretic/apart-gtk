@@ -24,19 +24,19 @@ If you have dependency issues, see the build sections for your distro. The GTK 3
   * zstd >= 1.2.0 *(optional: adds compression option)*
 
 ## Build on Arch
-`pacman -Syu --needed python python-gobject python-yaml python-pyzmq python-humanize gtk3 pigz partclone zeromq polkit rustup git`
+`pacman -Syu --needed python python-gobject python-yaml python-pyzmq python-humanize gtk3 partclone zeromq rustup git pigz polkit lz4 zstd`
 
 Follow build steps below.
 
 ## Build on Ubuntu >= 17.04
 Build deps: `apt install build-essential git libzmq3-dev curl pkg-config python3` + `rustup`
 
-Run deps: `apt install policykit-1 partclone pigz python3-humanize python3-zmq python3-yaml libgtk-3-0`
+Run deps: `apt install policykit-1 partclone pigz python3-humanize python3-zmq python3-yaml libgtk-3-0 liblz4-tool`
 
 Follow build steps below.
 
 ## Build on Fedora >= 25
-`dnf install git zeromq-devel rust cargo python3-zmq python3-yaml python3-humanize pigz polkit gtk3`
+`dnf install git zeromq-devel rust cargo python3-zmq python3-yaml python3-humanize pigz polkit gtk3 lz4 zstd`
 
 Install partclone, ie with something like
 ```sh
@@ -72,3 +72,5 @@ After building run `make install` which copies the build made in ./target to /us
 ## Run in test mode
 With the dev dependencies installed run `./start-test-app` to run from src/ a version of the code with
 partclone & partition info mocked. This is useful for GUI development, as you can clone and restore without data risk.
+
+Simply using `./start` will run using a dev version of [apart-core](https://github.com/alexheretic/apart-core) useful when testing changes to the core.
