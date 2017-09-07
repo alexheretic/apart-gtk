@@ -73,4 +73,4 @@ After building run `make install` which copies the build made in ./target to /us
 With the dev dependencies installed run `./start-test-app` to run from src/ a version of the code with
 partclone & partition info mocked. This is useful for GUI development, as you can clone and restore without data risk.
 
-Simply using `./start` will run using a dev version of [apart-core](https://github.com/alexheretic/apart-core) useful when testing changes to the core.
+Simply using `./start` will run against real disks using a dev version of [apart-core](https://github.com/alexheretic/apart-core) useful when testing changes to the core.
