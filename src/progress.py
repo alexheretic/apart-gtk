@@ -7,6 +7,8 @@ from historic_job import FinishedJob
 import running_job
 from running_job import RunningJob
 import settings
+import sys
+import subprocess
 
 log = logging.getLogger('ProgressAndHistoryView')
 
@@ -133,6 +135,16 @@ class ProgressAndHistoryView(Gtk.Stack):
                 finished_job.default_extra_reveal()
 
         self.update_view()
+
+        if not self.running_jobs:
+            try:
+                # notify backups are complete
+                subprocess.call(['notify-send',
+                                 '--icon=object-select',
+                                 'Apart tasks completed',
+                                 'All running clones/restores have finished'])
+            except (OSError, ValueError) as _:
+                print('Warn: Could not call notify-send', file=sys.stderr)
 
     def forget(self, job: FinishedJob):
         del self.finished_jobs[job.msg['id']]
