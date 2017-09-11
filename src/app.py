@@ -3,6 +3,7 @@ import argparse
 import gi
 gi.require_version('Gtk', '3.0')  # require version before other importing
 import os
+import signal
 from apartcore import ApartCore, MessageListener
 from main import CloneBody
 from typing import *
@@ -97,6 +98,9 @@ class Window(Gtk.Window):
 
 def main():
     win = Window()
+    # allow keyboard interrupt / nodemon to end program cleanly
+    for sig in [signal.SIGINT, signal.SIGTERM, signal.SIGUSR2]:
+        signal.signal(sig, lambda _s, _f: win.on_delete())
 
     style_provider = Gtk.CssProvider()
     style_provider.load_from_path(os.path.dirname(os.path.realpath(__file__)) + "/apart.css")
@@ -108,6 +112,7 @@ def main():
 
     win.show_all()
     Gtk.main()
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(

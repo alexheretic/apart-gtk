@@ -3,6 +3,9 @@
 set -eu
 dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
+# run doctests
+python -m doctest $dir/src/*.py
+
 (cd $dir/apart-core && cargo build)
 
 now=$(date +%Y-%m-%dT%H)

@@ -18,7 +18,9 @@ class ProgressAndHistoryView(Gtk.Stack):
         Gtk.Stack.__init__(self)
         self.core = core
         self.z_options = z_options
+
         self.get_style_context().add_class('progress-view')
+        self.next_notification = NotificationHelper()
 
         self.nothing_label = Gtk.Label('Select a partition to clone', xalign=0.5, vexpand=True)
         self.nothing_label.get_style_context().add_class('dim-label')
@@ -118,13 +120,13 @@ class ProgressAndHistoryView(Gtk.Stack):
 
         # remove all and re-add for ordering
         to_remove = []
-        for id, existing_job in self.finished_jobs.items():
+        for existing_id, existing_job in self.finished_jobs.items():
             existing_job.remove_from_grid()
             if existing_job.similar_to(job):
-                to_remove.append(id)
+                to_remove.append(existing_id)
 
-        for id in to_remove:
-            del self.finished_jobs[id]
+        for remove_job_id in to_remove:
+            del self.finished_jobs[remove_job_id]
 
         self.finished_jobs[job_id] = job
         for finished_job in sorted(self.finished_jobs.values(),
@@ -136,15 +138,29 @@ class ProgressAndHistoryView(Gtk.Stack):
 
         self.update_view()
 
-        if not self.running_jobs:
-            try:
-                # notify backups are complete
-                subprocess.call(['notify-send',
-                                 '--icon=object-select',
-                                 'Apart tasks completed',
-                                 'All running clones/restores have finished'])
-            except (OSError, ValueError) as _:
-                print('Warn: Could not call notify-send', file=sys.stderr)
+        if self.next_notification.enabled:
+            if final_msg['type'] == 'clone':
+                # success
+                self.next_notification.successes += 1
+            else:
+                # ignore cancels, as they are manual
+                if final_msg.get('error') != 'Cancelled':
+                    self.next_notification.failures += 1
+
+            if not self.running_jobs:
+                try:
+                    notification_subject = self.next_notification.subject()
+                    notification_body = self.next_notification.body()
+                    if notification_subject and notification_body:
+                        subprocess.call(['notify-send',
+                                         '--icon={}'.format(self.next_notification.icon()),
+                                         notification_subject,
+                                         notification_body])
+                        self.next_notification.reset_counts()
+                except (OSError, ValueError) as _:
+                    print('Warn: Command `notify-send` failed, disabling desktop notification',
+                          file=sys.stderr)
+                    self.next_notification.enabled = False
 
     def forget(self, job: FinishedJob):
         del self.finished_jobs[job.msg['id']]
@@ -154,3 +170,94 @@ class ProgressAndHistoryView(Gtk.Stack):
     def save_history(self, arg=None):
         history = list(map(lambda j: j.msg, self.finished_jobs.values()))
         settings.write_history(history)
+
+
+class NotificationHelper:
+    """
+    Desktop notification helper
+
+    >>> next_notification = NotificationHelper()
+    >>> next_notification.subject()
+    ''
+
+    >>> next_notification = NotificationHelper()
+    >>> next_notification.successes = 1
+    >>> next_notification.subject()
+    'Apart tasks completed'
+
+    >>> next_notification.body()
+    '1 task has finished successfully'
+
+    >>> next_notification.successes = 3
+
+    >>> next_notification.body()
+    '3 tasks have finished successfully'
+
+    >>> next_notification.failures = 1
+    >>> next_notification.body()
+    '1 task has failed, 3 tasks have finished successfully'
+
+    >>> next_notification = NotificationHelper()
+    >>> next_notification.failures = 20
+    >>> next_notification.subject()
+    'Apart tasks completed'
+
+    >>> next_notification.body()
+    '20 tasks have failed'
+
+    >>> next_notification = NotificationHelper()
+    >>> next_notification.successes = 20
+    >>> next_notification.failures = 44
+    >>> next_notification.reset_counts()
+    >>> next_notification.successes
+    0
+    >>> next_notification.failures
+    0
+
+    >>> next_notification = NotificationHelper()
+    >>> next_notification.successes = 3
+    >>> next_notification.icon()
+    'object-select'
+    >>> next_notification.failures = 1
+    >>> next_notification.icon()
+    'dialog-warning'
+    """
+    def __init__(self):
+        self.successes = 0
+        self.failures = 0
+        self.enabled = True
+        pass
+
+    def subject(self) -> str:
+        if self.successes + self.failures > 0:
+            return 'Apart tasks completed'
+        return ''
+
+    def body(self) -> str:
+        body = ''
+        if self.failures:
+            if self.failures == 1:
+                body = '1 task has failed'
+            else:
+                body = '{} tasks have failed'.format(self.failures)
+
+        if self.successes:
+            if body:
+                body += ', '
+            if self.successes == 1:
+                body += '1 task has finished successfully'
+            else:
+                body += '{} tasks have finished successfully'.format(self.successes)
+
+        return body
+
+    def icon(self) -> str:
+        if self.failures:
+            return 'dialog-warning'
+        if self.successes:
+            return 'object-select'
+        return ''
+
+    def reset_counts(self):
+        self.successes = 0
+        self.failures = 0

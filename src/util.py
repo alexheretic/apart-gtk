@@ -8,20 +8,39 @@ source_re = re.compile(r"^/dev/")
 
 
 def extract_directory(path: str) -> str:
+    """
+    >>> extract_directory('/mnt/backups/work-2017-05-03T1020.apt.dd.gz')
+    '/mnt/backups'
+    """
     return re.sub(filename_re, '', path)
 
 
 def extract_filename(path: str) -> str:
+    """
+    >>> extract_filename('/mnt/backups/work-2017-05-03T1020.apt.dd.gz')
+    'work-2017-05-03T1020.apt.dd.gz'
+    """
     m = re.fullmatch(name_re, path)
     return m.group(1)
 
 
 def extract_name(path: str) -> str:
+    """
+    >>> extract_name('/mnt/backups/work-2017-05-03T1020.apt.dd.gz')
+    'work'
+    """
     m = re.fullmatch(name_re, path)
     return m.group(2)
 
 
 def extract_compression_option(path: str) -> str:
+    """
+    >>> extract_compression_option('/mnt/backups/work-2017-05-03T1020.apt.dd.gz')
+    'gz'
+
+    >>> extract_compression_option('/mnt/123/main-2017-05-03T1020.apt.dd.zstd')
+    'zst'
+    """
     m = re.fullmatch(name_re, path)
     z_option = m.group(3)
     if z_option == 'zstd':  # fix v0.14 extension
@@ -30,6 +49,10 @@ def extract_compression_option(path: str) -> str:
 
 
 def rm_dev(source: str) -> str:
+    """
+    >>> rm_dev("/dev/sda1")
+    'sda1'
+    """
     return re.sub(source_re, '', source)
 
 
