@@ -52,8 +52,9 @@
 
 .finished-job-stats {
   margin-top: -3px;
-  margin-left: 6px;
+  margin-left: 2em;
 }
+
 .finished-job-title > image {
   padding-right: 6px;
   margin-bottom: 2px;
@@ -72,9 +73,10 @@
 .job-name {
   margin: 0 1ex;
   font-style: italic;
+  font-weight: bold;
 }
 
-/* enforce sidebar style for themes that lack it, ie ambience */
+/* enforce sidebar style for themes that lack it, ie ambiance */
 .frame row {
   padding: 10px 4px;
 }

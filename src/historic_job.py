@@ -50,7 +50,8 @@ class FinishedJob:
 
         self.source_available = SourceAvailability.GONE
 
-        self.duration = key_and_val(DURATION_KEY, str(round_to_second(self.msg['finish'] - self.msg['start'])))
+        self.duration = key_and_val(DURATION_KEY, str(round_to_second(self.msg['finish'] -
+                                                                      self.msg['start'])))
 
         self.icon = Gtk.Image.new_from_icon_name(icon_name, Gtk.IconSize.LARGE_TOOLBAR)
         title_source = Gtk.Label('', xalign=0)
@@ -85,7 +86,8 @@ class FinishedJob:
         self.finish_box.add(self.finish_label)
         self.finish_box.connect('button-press-event', self.on_row_click)
 
-        self.rerun_btn = Gtk.Button.new_from_icon_name('view-refresh-symbolic', Gtk.IconSize.SMALL_TOOLBAR)
+        self.rerun_btn = Gtk.Button.new_from_icon_name('view-refresh-symbolic',
+                                                       Gtk.IconSize.SMALL_TOOLBAR)
         self.rerun_btn.set_tooltip_text(RERUN_TIP)
         self.rerun_btn.connect('clicked', self.rerun)
         self.forget_btn = Gtk.Button(FORGET_TEXT)
@@ -97,16 +99,21 @@ class FinishedJob:
         self.buttons.get_style_context().add_class('job-buttons')
         self.buttons.show_all()
 
-        self.extra = Gtk.Revealer(transition_duration=settings.animation_duration_ms(), visible=True)
+        self.extra = Gtk.Revealer(transition_duration=settings.animation_duration_ms(),
+                                  visible=True)
         self.extra.set_reveal_child(RevealState.default() is RevealState.REVEALED)
-        self.compression_available = extract_compression_option(self.msg['destination']) in z_options
+        self.compression_available = \
+            extract_compression_option(self.msg['destination']) in z_options
         self.update()
 
     def purpose(self) -> str:
-        return '{} -> {}'.format(rm_dev(self.msg['source']), extract_directory(self.msg['destination']))
+        return '{} -> {}'.format(rm_dev(self.msg['source']),
+                                 extract_directory(self.msg['destination']))
 
     def similar_to(self, other: 'FinishedJob') -> bool:
-        """:return True => other is similar enough for both not to need to appear in the history grid"""
+        """
+        :return True => other is similar enough for both not to need to appear in the history grid
+        """
         return type(self) == type(other) and self.purpose() == other.purpose()
 
     def remove_from_grid(self):
@@ -117,7 +124,8 @@ class FinishedJob:
 
     def on_row_click(self, *args):
         self.toggle_reveal_extra()
-        self.extra_user_state = RevealState.REVEALED if self.extra.get_reveal_child() else RevealState.HIDDEN
+        self.extra_user_state = RevealState.REVEALED if self.extra.get_reveal_child() \
+            else RevealState.HIDDEN
 
     def toggle_reveal_extra(self):
         revealed = self.extra.get_reveal_child()
@@ -155,7 +163,8 @@ class FinishedJob:
         elif self.source_available == SourceAvailability.GONE:
             tooltip = rm_dev(self.msg['source']) + " is not currently available"
         elif not self.compression_available:
-            tooltip = extract_compression_option(self.msg['destination']) + ' compression is not installed'
+            tooltip = extract_compression_option(self.msg['destination']) + \
+                      ' compression is not installed'
         self.rerun_btn.set_tooltip_text(tooltip)
 
     def forget(self, button=None):
@@ -199,7 +208,12 @@ class FailedClone(FinishedJob):
                  progress_view: 'ProgressAndHistoryView',
                  core: ApartCore,
                  z_options: List[str]):
-        FinishedJob.__init__(self, final_message, progress_view, core, icon_name='dialog-error', z_options=z_options)
+        FinishedJob.__init__(self,
+                             final_message,
+                             progress_view,
+                             core,
+                             icon_name='dialog-error',
+                             z_options=z_options)
         self.fail_reason = key_and_val('Failed', self.msg['error'])
         self.stats = Gtk.VBox()
         self.stats.add(self.fail_reason)
@@ -230,9 +244,15 @@ class SuccessfulClone(FinishedJob):
                  progress_view: 'ProgressAndHistoryView',
                  core: ApartCore,
                  z_options: List[str]):
-        FinishedJob.__init__(self, final_message, progress_view, core, icon_name='object-select-symbolic',
-                             forget_on_rerun=False, z_options=z_options)
-        self.image_size = key_and_val('Image size', humanize.naturalsize(self.msg['image_size'], binary=True))
+        FinishedJob.__init__(self, final_message,
+                             progress_view,
+                             core,
+                             icon_name='object-select-symbolic',
+                             forget_on_rerun=False,
+                             z_options=z_options)
+
+        self.image_size = key_and_val('Image size', humanize.naturalsize(self.msg['image_size'],
+                                                                         binary=True))
         self.filename = key_and_val('Image file', extract_filename(self.msg['destination']))
         self.stats = Gtk.VBox()
         for stat in [self.filename, self.image_size, self.duration]:
@@ -240,7 +260,8 @@ class SuccessfulClone(FinishedJob):
         self.stats.get_style_context().add_class('finished-job-stats')
         self.stats.show_all()
         self.extra.add(self.stats)
-        self.delete_image_btn = Gtk.Button.new_from_icon_name('user-trash-full-symbolic', Gtk.IconSize.SMALL_TOOLBAR)
+        self.delete_image_btn = Gtk.Button.new_from_icon_name('user-trash-full-symbolic',
+                                                              Gtk.IconSize.SMALL_TOOLBAR)
         self.delete_image_btn.set_tooltip_text(DELETE_TIP)
         self.delete_image_btn.show_all()
         self.delete_image_btn.connect('clicked', self.delete_image)
@@ -264,10 +285,12 @@ class SuccessfulClone(FinishedJob):
 
     def similar_to(self, other: FinishedJob) -> bool:
         """
-        As successful clones indicate space being taken up on the file system, it should only be lost from the history
-        if another task overwrote the same file (which as it includes at to-minute timestamp should be rare)
+        As successful clones indicate space being taken up on the file system, it should only be
+        lost from the history if another task overwrote the same file (which as it includes at
+        to-minute timestamp should be rare)
         """
-        return FinishedJob.similar_to(self, other) and self.msg['destination'] == other.msg['destination']
+        return FinishedJob.similar_to(self, other) and \
+            self.msg['destination'] == other.msg['destination']
 
     def delete_image(self, arg=None):
         filename = self.msg['destination']
@@ -300,8 +323,9 @@ class SuccessfulClone(FinishedJob):
                 self.rerun_btn.set_tooltip_text(RERUN_TIP)
                 self.delete_image_btn.set_tooltip_text(DELETE_TIP)
 
-        MessageListener(message_predicate=lambda m: m['type'] in ['deleted-clone', 'delete-clone-failed'] and
-                                                    m['file'] == filename,
+        MessageListener(message_predicate=lambda m: m['type'] in ['deleted-clone',
+                                                                  'delete-clone-failed'] and
+                                                                 m['file'] == filename,
                         on_message=lambda m: GLib.idle_add(on_response, m),
                         listen_to=self.core,
                         one_time=True)
@@ -310,13 +334,14 @@ class SuccessfulClone(FinishedJob):
 
 
 class FailedRestore(FinishedJob):
-    def __init__(self,
-                 final_message:
+    def __init__(self, final_message:
                  Dict,
                  progress_view: 'ProgressAndHistoryView',
                  core: ApartCore,
                  z_options: List[str]):
-        FinishedJob.__init__(self, final_message, progress_view, core, icon_name='dialog-error', z_options=z_options)
+        FinishedJob.__init__(self, final_message, progress_view, core, icon_name='dialog-error',
+                             z_options=z_options)
+
         self.fail_reason = key_and_val('Failed', self.msg['error'])
         self.image_source = key_and_val('Restoring from', self.msg['source'])
         self.stats = Gtk.VBox()
@@ -325,7 +350,8 @@ class FailedRestore(FinishedJob):
         self.stats.get_style_context().add_class('finished-job-stats')
         self.stats.show_all()
         self.extra.add(self.stats)
-        # naive rerun is unsafe for restore jobs as /dev/abc1 may refer to different partition than when last run
+        # naive rerun is unsafe for restore jobs as /dev/abc1 may refer to different partition
+        # than when last run
         self.rerun_btn.destroy()
 
     def add_to_grid(self, grid: Gtk.Grid):
@@ -352,8 +378,13 @@ class SuccessfulRestore(FinishedJob):
                  progress_view: 'ProgressAndHistoryView',
                  core: ApartCore,
                  z_options: List[str]):
-        FinishedJob.__init__(self, final_message, progress_view, core, icon_name='object-select-symbolic',
-                             forget_on_rerun=False, z_options=z_options)
+        FinishedJob.__init__(self, final_message,
+                             progress_view,
+                             core,
+                             icon_name='object-select-symbolic',
+                             forget_on_rerun=False,
+                             z_options=z_options)
+
         self.stats = Gtk.VBox()
         self.image_source = key_and_val('Restored from', self.msg['source'])
         for stat in [self.image_source, self.duration]:
@@ -361,7 +392,8 @@ class SuccessfulRestore(FinishedJob):
         self.stats.get_style_context().add_class('finished-job-stats')
         self.stats.show_all()
         self.extra.add(self.stats)
-        # naive rerun is unsafe for restore jobs as /dev/abc1 may refer to different partition than when last run
+        # naive rerun is unsafe for restore jobs as /dev/abc1 may refer to different partition
+        # than when last run
         self.rerun_btn.destroy()
 
     def add_to_grid(self, grid: Gtk.Grid):
@@ -388,11 +420,23 @@ def create(final_message: Dict,
            z_options: List[str]) -> FinishedJob:
     msg_type = final_message['type']
     if msg_type == 'clone':
-        return SuccessfulClone(final_message, progress_view=progress_view, core=core, z_options=z_options)
+        return SuccessfulClone(final_message,
+                               progress_view=progress_view,
+                               core=core,
+                               z_options=z_options)
     elif msg_type == 'clone-failed':
-        return FailedClone(final_message, progress_view=progress_view, core=core, z_options=z_options)
+        return FailedClone(final_message,
+                           progress_view=progress_view,
+                           core=core,
+                           z_options=z_options)
     elif msg_type == 'restore':
-        return SuccessfulRestore(final_message, progress_view=progress_view, core=core, z_options=z_options)
+        return SuccessfulRestore(final_message,
+                                 progress_view=progress_view,
+                                 core=core,
+                                 z_options=z_options)
     elif msg_type == 'restore-failed':
-        return FailedRestore(final_message, progress_view=progress_view, core=core, z_options=z_options)
+        return FailedRestore(final_message,
+                             progress_view=progress_view,
+                             core=core,
+                             z_options=z_options)
     raise Exception('Unknown type: ' + msg_type)
