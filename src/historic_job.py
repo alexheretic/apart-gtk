@@ -30,6 +30,7 @@ class SourceAvailability(Enum):
     AVAILABLE = 1
     GONE = 2
     MOUNTED = 3
+    UUID_MISMATCH = 4
 
 
 class FinishedJob:
@@ -162,6 +163,9 @@ class FinishedJob:
             tooltip = rm_dev(self.msg['source']) + " is currently mounted"
         elif self.source_available == SourceAvailability.GONE:
             tooltip = rm_dev(self.msg['source']) + " is not currently available"
+        elif self.source_available == SourceAvailability.UUID_MISMATCH:
+            tooltip = 'current {} does not match cloned partition uuid'\
+                .format(rm_dev(self.msg['source']))
         elif not self.compression_available:
             tooltip = extract_compression_option(self.msg['destination']) + \
                       ' compression is not installed'
@@ -190,11 +194,14 @@ class FinishedJob:
 
     def on_source_update(self, sources: Dict):
         source_part_name = rm_dev(self.msg['source'])
+        source_uuid = self.msg.get('source_uuid')
         for disk in sources:
             for part in disk['parts']:
                 if part['name'] == source_part_name:
                     if part['mounted']:
                         self.source_available = SourceAvailability.MOUNTED
+                    elif source_uuid and part.get('uuid') != source_uuid:
+                        self.source_available = SourceAvailability.UUID_MISMATCH
                     else:
                         self.source_available = SourceAvailability.AVAILABLE
                     return
@@ -254,9 +261,16 @@ class SuccessfulClone(FinishedJob):
         self.image_size = key_and_val('Image size', humanize.naturalsize(self.msg['image_size'],
                                                                          binary=True))
         self.filename = key_and_val('Image file', extract_filename(self.msg['destination']))
+
+        self.source_uuid = None
+        if self.msg.get('source_uuid'):
+            self.source_uuid = key_and_val('Partition uuid', self.msg['source_uuid'])
+
         self.stats = Gtk.VBox()
-        for stat in [self.filename, self.image_size, self.duration]:
-            self.stats.add(stat)
+        for stat in [self.filename, self.image_size, self.source_uuid, self.duration]:
+            if stat:
+                self.stats.add(stat)
+
         self.stats.get_style_context().add_class('finished-job-stats')
         self.stats.show_all()
         self.extra.add(self.stats)

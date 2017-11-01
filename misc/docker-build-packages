@@ -24,6 +24,11 @@ if [ -z "$APART_VERSION" ] || [ -z "$APART_SHA256" ]; then
   exit 1
 fi
 
+if [[ $(systemctl status docker | grep -c 'Active: inactive') -gt 0 ]]; then
+  echo "docker is currently inactive, must be started"
+  sudo systemctl start docker
+fi
+
 cd $DIR
 cd ..
 mkdir -p last-release
@@ -35,21 +40,20 @@ if [[ "$(docker images)" != *"apart/pkg-builder"* ]]; then
   docker cp $DIR/deb-build-packages "$DOCKER_NAME-temp":/
   docker cp $DIR/clean-container "$DOCKER_NAME-temp":/
   docker exec -t "$DOCKER_NAME-temp" ./deb-build-packages --version=$APART_VERSION --sha256=$APART_SHA256
-  docker exec -t "$DOCKER_NAME-temp" ./clean-container
-  docker stop "$DOCKER_NAME-temp" &
   docker cp "$DOCKER_NAME-temp":/apart-gtk_${APART_VERSION}_amd64.deb ./
   docker cp "$DOCKER_NAME-temp":/apart-gtk-${APART_VERSION}-1.x86_64.rpm ./
-  wait
+  docker exec -t "$DOCKER_NAME-temp" ./clean-container
+  docker stop "$DOCKER_NAME-temp"
   docker export "$DOCKER_NAME-temp" | docker import - apart/pkg-builder
-  docker rm "$DOCKER_NAME-temp"
+  docker rm $DOCKER_NAME-temp
 else
   echo "Using already created apart/pkg-builder image to build packages"
+  trap "docker rm $DOCKER_NAME >/dev/null 2>&1" EXIT ERR
   docker create --name $DOCKER_NAME -t apart/pkg-builder ./deb-build-packages --version=$APART_VERSION --sha256=$APART_SHA256
   docker cp $DIR/deb-build-packages $DOCKER_NAME:/
   docker start -a $DOCKER_NAME
   docker cp $DOCKER_NAME:/apart-gtk_${APART_VERSION}_amd64.deb ./
   docker cp $DOCKER_NAME:/apart-gtk-${APART_VERSION}-1.x86_64.rpm ./
-  docker rm $DOCKER_NAME
 fi
 
 gpg --armor --detach-sign apart-gtk_${APART_VERSION}_amd64.deb
