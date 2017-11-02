@@ -31,7 +31,7 @@ Follow build steps below.
 ## Build on Ubuntu >= 17.04
 Build deps: `apt install build-essential git libzmq3-dev curl pkg-config python3` + `rustup`
 
-Run deps: `apt install policykit-1 partclone pigz python3-humanize python3-zmq python3-yaml libgtk-3-0 liblz4-tool`
+Run deps: `apt install policykit-1 partclone pigz python3-humanize python3-zmq python3-yaml libgtk-3-0 liblz4-tool zstd`
 
 Follow build steps below.
 

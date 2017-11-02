@@ -36,7 +36,7 @@ cd last-release
 
 if [[ "$(docker images)" != *"apart/pkg-builder"* ]]; then
   echo "Creating apart/pkg-builder image, and using to build packages"
-  docker run --name "$DOCKER_NAME-temp" -d ubuntu:17.04 tail -f /dev/null
+  docker run --name "$DOCKER_NAME-temp" -d ubuntu:17.10 tail -f /dev/null
   docker cp $DIR/deb-build-packages "$DOCKER_NAME-temp":/
   docker cp $DIR/clean-container "$DOCKER_NAME-temp":/
   docker exec -t "$DOCKER_NAME-temp" ./deb-build-packages --version=$APART_VERSION --sha256=$APART_SHA256
