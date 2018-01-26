@@ -5,7 +5,7 @@ CARGO_CMD="rustup run stable cargo"
 while test $# -gt 0; do
   case "$1" in
     --cargo-cmd*)
-      CARGO_CMD=`echo $1 | sed -e 's/^[^=]*=//g'`
+      CARGO_CMD=$(echo "$1" | sed -e 's/^[^=]*=//g')
       shift
       ;;
   esac
@@ -15,39 +15,39 @@ APART_CORE_VERSION="0.3.5"
 APART_CORE_SHA256='2cfa78ec5a656e89894333a3ece563b5b29a40aed8e7504a048817935c9491cf'
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
-cd $DIR
+cd "$DIR"
 rm -rf target
-mkdir -p $DIR/target/lib/apart-gtk/src
+mkdir -p "$DIR"/target/lib/apart-gtk/src
 
 echo "Building apart-core $APART_CORE_VERSION"
-cd $DIR/target
+cd "$DIR"/target
 curl -o core.tar.gz -L https://github.com/alexheretic/apart-core/archive/v$APART_CORE_VERSION.tar.gz
 echo "$APART_CORE_SHA256 core.tar.gz" | sha256sum -c
 tar xf core.tar.gz
-(cd apart-core-$APART_CORE_VERSION && $CARGO_CMD build --release)
+(cd apart-core-$APART_CORE_VERSION && echo '[workspace]' >> Cargo.toml && $CARGO_CMD build --release)
 cp apart-core-$APART_CORE_VERSION/target/release/apart-core lib/apart-gtk/
 rm core.tar.gz
 rm -rf apart-core-$APART_CORE_VERSION
 
 
 echo 'Copy & compile sources'
-cd $DIR/target/lib/apart-gtk/src
-cp -r $DIR/src/* ./
+cd "$DIR"/target/lib/apart-gtk/src
+cp -r "$DIR"/src/* ./
 python3 -m compileall ./
 
 
 echo 'Copy misc & icons'
-cd $DIR/target
+cd "$DIR"/target
 mkdir -p share/applications
-cp $DIR/misc/*.desktop share/applications/
+cp "$DIR"/misc/*.desktop share/applications/
 mkdir -p share/icons/hicolor/scalable/apps/
-cp $DIR/icon/apart.svg share/icons/hicolor/scalable/apps/
+cp "$DIR"/icon/apart.svg share/icons/hicolor/scalable/apps/
 mkdir -p share/icons/hicolor/48x48/apps/
-cp $DIR/icon/apart.png share/icons/hicolor/48x48/apps/
+cp "$DIR"/icon/apart.png share/icons/hicolor/48x48/apps/
 mkdir -p share/polkit-1/actions
-cp $DIR/misc/*.policy share/polkit-1/actions/
+cp "$DIR"/misc/*.policy share/polkit-1/actions/
 mkdir -p bin
 ln -s ../lib/apart-gtk/src/app.py bin/apart-gtk
 
 
-command -v tree >/dev/null 2>&1 && tree $DIR/target || true
+command -v tree >/dev/null 2>&1 && tree "$DIR"/target || true
