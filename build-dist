@@ -24,7 +24,7 @@ cd "$DIR"/target
 curl -o core.tar.gz -L https://github.com/alexheretic/apart-core/archive/v$APART_CORE_VERSION.tar.gz
 echo "$APART_CORE_SHA256 core.tar.gz" | sha256sum -c
 tar xf core.tar.gz
-(cd apart-core-$APART_CORE_VERSION && echo '[workspace]' >> Cargo.toml && $CARGO_CMD build --release)
+(cd apart-core-$APART_CORE_VERSION && $CARGO_CMD build --release)
 cp apart-core-$APART_CORE_VERSION/target/release/apart-core lib/apart-gtk/
 rm core.tar.gz
 rm -rf apart-core-$APART_CORE_VERSION

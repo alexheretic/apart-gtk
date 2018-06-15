@@ -1,6 +1,0 @@
-# workspace for rls support
-
-[workspace]
-members = [
-    "apart-core",
-]
