@@ -11,7 +11,7 @@
    version="1.1"
    id="svg33"
    sodipodi:docname="apart.svg"
-   inkscape:version="0.92.1 r">
+   inkscape:version="0.92.2 2405546, 2018-03-11">
   <metadata
      id="metadata37">
     <rdf:RDF>
@@ -20,7 +20,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -33,16 +33,16 @@
      guidetolerance="10"
      inkscape:pageopacity="0"
      inkscape:pageshadow="2"
-     inkscape:window-width="1873"
-     inkscape:window-height="1012"
+     inkscape:window-width="1252"
+     inkscape:window-height="1385"
      id="namedview35"
      showgrid="false"
      showguides="false"
-     inkscape:zoom="9.8333333"
-     inkscape:cx="-4.5373982"
-     inkscape:cy="18.613376"
-     inkscape:window-x="273"
-     inkscape:window-y="207"
+     inkscape:zoom="14.909867"
+     inkscape:cx="15.627119"
+     inkscape:cy="9.8964051"
+     inkscape:window-x="57"
+     inkscape:window-y="27"
      inkscape:window-maximized="0"
      inkscape:current-layer="g4604">
     <inkscape:grid
@@ -116,31 +116,29 @@
      inkscape:label="A shadow"
      id="g4604"
      inkscape:groupmode="layer">
-    <text
-       id="text4602"
-       y="37.627117"
-       x="10.677966"
+    <g
+       aria-label="A"
        style="font-style:normal;font-weight:normal;font-size:40px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;opacity:1;fill:#000000;fill-opacity:1;stroke:none"
-       xml:space="preserve"><tspan
-         y="37.627117"
-         x="10.677966"
-         id="tspan4600"
-         sodipodi:role="line">A</tspan></text>
+       id="text4602">
+      <path
+         d="M 24.349841,12.35368 18.998279,26.865398 H 29.720935 Z M 22.123279,8.4669609 h 4.472656 L 37.709216,37.627117 h -4.101562 l -2.65625,-7.480469 H 17.806872 l -2.65625,7.480469 h -4.160156 z"
+         style=""
+         id="path58" />
+    </g>
   </g>
   <g
      inkscape:groupmode="layer"
      id="layer1"
      inkscape:label="A"
      style="display:inline;opacity:0.8">
-    <text
-       xml:space="preserve"
+    <g
+       aria-label="A"
        style="font-style:normal;font-weight:normal;font-size:40px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;opacity:1;fill:#000037;fill-opacity:1;stroke:none"
-       x="10.474576"
-       y="37.423729"
-       id="text3718"><tspan
-         sodipodi:role="line"
-         id="tspan3716"
-         x="10.474576"
-         y="37.423729">A</tspan></text>
+       id="text3718">
+      <path
+         d="M 24.146451,12.150291 18.794888,26.66201 H 29.517545 Z M 21.919888,8.2635727 h 4.472657 L 37.505826,37.423729 H 33.404263 L 30.748013,29.94326 H 17.603482 l -2.65625,7.480469 h -4.160156 z"
+         style=""
+         id="path36" />
+    </g>
   </g>
 </svg>
