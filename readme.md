@@ -1,6 +1,10 @@
+<img align="left" alt="" src="icon/apart.svg" height="150" />
+
 Apart GTK
 =========
 Linux GUI for cloning & restoring disk partitions to & from compressed image files, using [partclone](http://partclone.org) to do the heavy lifting.
+
+<br/>
 
 ![Usage](https://raw.githubusercontent.com/alexheretic/apart-gtk/readme-images/apart-gtk-usage.gif?raw=true "Usage")
 
