@@ -103,7 +103,8 @@ class FinishedJob:
         self.extra = Gtk.Revealer(transition_duration=settings.animation_duration_ms(),
                                   visible=True)
         self.extra.set_reveal_child(RevealState.default() is RevealState.REVEALED)
-        self.compression_available = \
+
+        self.compression_available = not final_message['type'].startswith('clone') or \
             extract_compression_option(self.msg['destination']) in z_options
         self.update()
 
