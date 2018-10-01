@@ -144,7 +144,7 @@ class RunningClone(RunningJob):
             self.title_source.set_text(rm_dev(self.last_message['source']))
             self.title_name.set_text(extract_name(self.last_message['destination']))
             self.title_name.get_style_context().add_class("job-name")
-            self.title_dest.set_text('-> ' + extract_directory(self.last_message['destination']))
+            self.title_dest.set_text('⟶ ' + extract_directory(self.last_message['destination']))
 
 
 class RunningRestore(RunningJob):
@@ -160,7 +160,7 @@ class RunningRestore(RunningJob):
         RunningJob.handle_message(self, msg)
         if not self.finished():
             self.title_source.set_text(extract_filename(self.last_message['source']))
-            self.title_dest.set_text('-> ' + rm_dev(self.last_message['destination']))
+            self.title_dest.set_text('⟶ ' + rm_dev(self.last_message['destination']))
 
 
 def create(msg: Dict, core: ApartCore, on_finish: Callable[[Dict], None]) -> RunningJob:

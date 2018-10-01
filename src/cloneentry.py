@@ -120,9 +120,9 @@ class CloneToImageEntry(Gtk.Box):
 
         if self.last_part_info:
             if compression:
-                self.title.set_text(self.last_part_info.dev_name() + ' -> compressed image file')
+                self.title.set_text(self.last_part_info.dev_name() + ' ⟶ compressed image file')
             else:
-                self.title.set_text(self.last_part_info.dev_name() + ' -> uncompressed image file')
+                self.title.set_text(self.last_part_info.dev_name() + ' ⟶ uncompressed image file')
 
     def start_clone(self):
         backup_dir = self.dir_entry.get_filename()

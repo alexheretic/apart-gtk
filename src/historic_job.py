@@ -63,10 +63,10 @@ class FinishedJob:
             title_source.set_text(rm_dev(self.msg['source']))
             title_name.set_text(extract_name(self.msg['destination']))
             title_name.get_style_context().add_class("job-name")
-            title_destination.set_text('-> ' + extract_directory(self.msg['destination']))
+            title_destination.set_text('⟶ ' + extract_directory(self.msg['destination']))
         else:
             title_source.set_text(extract_filename(self.msg['source']))
-            title_destination.set_text(' -> ' + rm_dev(self.msg['destination']))
+            title_destination.set_text(' ⟶ ' + rm_dev(self.msg['destination']))
 
         self.title_inner_box = Gtk.Box(hexpand=True)
         self.title_inner_box.add(self.icon)
@@ -109,7 +109,7 @@ class FinishedJob:
         self.update()
 
     def purpose(self) -> str:
-        return '{} -> {}'.format(rm_dev(self.msg['source']),
+        return '{} ⟶ {}'.format(rm_dev(self.msg['source']),
                                  extract_directory(self.msg['destination']))
 
     def similar_to(self, other: 'FinishedJob') -> bool:

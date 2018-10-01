@@ -70,7 +70,7 @@ class RestoreFromImageEntry(Gtk.Box):
         z_options = ', '.join(map(lambda z: '.' + z, self.z_options))
 
         if self.last_part_info:
-            self.title.set_text('Image file ({}) -> {}'.format(z_options, self.last_part_info.dev_name()))
+            self.title.set_text('Image file ({}) ⟶ {}'.format(z_options, self.last_part_info.dev_name()))
 
     def user_confirm(self):
         dialog = OkCancelDialog(self.get_toplevel(),
