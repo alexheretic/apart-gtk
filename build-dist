@@ -11,8 +11,8 @@ while test $# -gt 0; do
   esac
 done
 
-APART_CORE_VERSION="0.3.6"
-APART_CORE_SHA256='614d40cecceef832aa38e33a80ff96a0723449e359a7529bd9e863a4d01aed57'
+APART_CORE_VERSION="0.3.7"
+APART_CORE_SHA256='32d2f74829867d5d9192dcd095be3bb001e4a641745f2aae7e3e43b80d82492b'
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 cd "$DIR"
