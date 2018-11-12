@@ -4,8 +4,8 @@
 ## Assume was called with expected args '-Jbo name,size,fstype,label,mountpoint'
 echo '{
   "blockdevices": [
-    {"name": "loop0", "size": "1553670144", "fstype": "squashfs", "label": null, "mountpoint": "/rofs"},
-    {"name": "sda", "size": "21474836480", "fstype": null, "label": null, "mountpoint": null},
-    {"name": "sr0", "size": "1609039872", "fstype": "iso9660", "label": "Ubuntu 17.04 amd64", "mountpoint": "/cdrom"}
+    {"name": "loop0", "size": 1553670144, "fstype": "squashfs", "label": null, "mountpoint": "/rofs"},
+    {"name": "sda", "size": 21474836480, "fstype": null, "label": null, "mountpoint": null},
+    {"name": "sr0", "size": 1609039872, "fstype": "iso9660", "label": "Ubuntu 17.04 amd64", "mountpoint": "/cdrom"}
   ]
 }'
