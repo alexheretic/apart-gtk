@@ -29,16 +29,15 @@ if [[ $(systemctl status docker | grep -c 'Active: inactive') -gt 0 ]]; then
   sudo systemctl start docker
 fi
 
-cd $DIR
-cd ..
+cd "$DIR/.."
 mkdir -p last-release
 cd last-release
 
 if [[ "$(docker images)" != *"apart/pkg-builder"* ]]; then
   echo "Creating apart/pkg-builder image, and using to build packages"
-  docker run --name "$DOCKER_NAME-temp" -d ubuntu:17.10 tail -f /dev/null
-  docker cp $DIR/deb-build-packages "$DOCKER_NAME-temp":/
-  docker cp $DIR/clean-container "$DOCKER_NAME-temp":/
+  docker run --name "$DOCKER_NAME-temp" -d ubuntu:18.04 tail -f /dev/null
+  docker cp "$DIR/deb-build-packages" "$DOCKER_NAME-temp":/
+  docker cp "$DIR/clean-container" "$DOCKER_NAME-temp":/
   docker exec -t "$DOCKER_NAME-temp" ./deb-build-packages --version=$APART_VERSION --sha256=$APART_SHA256
   docker cp "$DOCKER_NAME-temp":/apart-gtk_${APART_VERSION}_amd64.deb ./
   docker cp "$DOCKER_NAME-temp":/apart-gtk-${APART_VERSION}-1.x86_64.rpm ./
