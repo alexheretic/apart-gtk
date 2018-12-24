@@ -21,7 +21,7 @@ If you have dependency issues, see the build sections for your distro. The GTK 3
 * pyzmq, humanize, pyyaml
 * polkit - for non-root usage
 * [apart-core](https://github.com/alexheretic/apart-core)
-  * zeromq > 4
+  * zeromq >= 4.1
   * partclone
   * pigz
   * lz4 *(optional: adds compression option)*
