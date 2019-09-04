@@ -77,7 +77,7 @@ class ApartCore(Thread):
     def run(self):
         while self.process.returncode is None:
             try:
-                msg = yaml.load(self.socket.recv_string())
+                msg = yaml.safe_load(self.socket.recv_string())
             except zmq.error.Again:
                 # no messages received within timeout
                 self.process.poll()

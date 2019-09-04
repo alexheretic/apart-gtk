@@ -23,14 +23,14 @@ def read_history() -> List[Dict]:
     if not os.path.exists(history_path()):
         return []
     with open(history_path(), 'r') as file:
-        return default_datetime_to_utc(yaml.load(file.read()))
+        return default_datetime_to_utc(yaml.safe_load(file.read()))
 
 
 def write_history(history: List[Dict]):
     if not os.path.exists(history_path()):
         os.makedirs(os.path.dirname(history_path()))
     with open(history_path(), 'w') as file:
-        file.write(yaml.dump(history))
+        file.write(yaml.safe_dump(history))
 
 
 def animation_duration_ms() -> int:
