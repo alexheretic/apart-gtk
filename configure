@@ -33,6 +33,6 @@ fi
 if $failed; then exit 1; fi
 
 sed "s|PREFIX = /usr|PREFIX = $PREFIX|" makefile.template > makefile
-if [ ! -z "$build_dist_args" ]; then
+if [ -n "$build_dist_args" ]; then
   sed -i "s|build_dist_args?=|build_dist_args?='$build_dist_args'|" makefile
 fi
