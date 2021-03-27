@@ -4,19 +4,19 @@ set -eu
 dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 # run doctests
-python -m doctest $dir/src/*.py
+python -m doctest "$dir"/src/*.py
 
-(cd $dir/apart-core && cargo build)
+(cd "$dir"/apart-core && cargo build)
 
 now=$(date +%Y-%m-%dT%H)
-if [ -f ~/.config/apart-gtk/history.yaml ] && [ ! -f $dir/history-backup-$now.yaml ]; then
+if [ -f ~/.config/apart-gtk/history.yaml ] && [ ! -f "$dir/history-backup-$now.yaml" ]; then
   echo "Backing up ~/.config/apart-gtk/history.yaml -> history-backup-$now.yaml"
-  cp ~/.config/apart-gtk/history.yaml $dir/history-backup-$now.yaml
+  cp ~/.config/apart-gtk/history.yaml "$dir/history-backup-$now.yaml"
 fi
 
 RUST_BACKTRACE=full \
-  APART_PARTCLONE_CMD=$dir/test/mockpcl \
-  APART_GTK_CORE_CMD=$dir/apart-core/target/debug/apart-core \
+  APART_PARTCLONE_CMD="$dir/test/mockpcl" \
+  APART_GTK_CORE_CMD="$dir/apart-core/target/debug/apart-core" \
   RUST_LOG=info \
-  APART_LSBLK_CMD=$dir/test/mocklsblk \
-  $dir/src/app.py
+  APART_LSBLK_CMD="$dir/test/mocklsblk" \
+  "$dir/src/app.py"
