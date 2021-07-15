@@ -11,8 +11,8 @@ while test $# -gt 0; do
   esac
 done
 
-APART_CORE_VERSION="0.3.10"
-APART_CORE_SHA256='32c5c58209ad6cab7bb7bc84c139782ada7f42fb68d95c46d69e72735d2b2e3c'
+APART_CORE_VERSION="0.3.11"
+APART_CORE_SHA256='4e5018fab750f6d7d16a3c72458d97be4e9163171c2d75d5e5bf53bf59443e74'
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 cd "$DIR"
@@ -22,10 +22,11 @@ mkdir -p "$DIR"/target/lib/apart-gtk/src
 echo "Building apart-core $APART_CORE_VERSION"
 cd "$DIR"/target
 curl -o core.tar.gz -L https://github.com/alexheretic/apart-core/archive/v$APART_CORE_VERSION.tar.gz
+sha256sum core.tar.gz
 echo "$APART_CORE_SHA256 core.tar.gz" | sha256sum -c
 tar xf core.tar.gz
 (cd apart-core-$APART_CORE_VERSION && $CARGO_CMD build --release)
-cp apart-core-$APART_CORE_VERSION/target/release/apart-core lib/apart-gtk/
+cp "${CARGO_TARGET_DIR:-"apart-core-$APART_CORE_VERSION/target"}/release/apart-core" lib/apart-gtk/
 strip lib/apart-gtk/apart-core
 rm core.tar.gz
 rm -rf apart-core-$APART_CORE_VERSION

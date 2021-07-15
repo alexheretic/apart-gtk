@@ -16,7 +16,7 @@ fi
 
 RUST_BACKTRACE=full \
   APART_PARTCLONE_CMD="$dir/test/mockpcl" \
-  APART_GTK_CORE_CMD="$dir/apart-core/target/debug/apart-core" \
+  APART_GTK_CORE_CMD="${CARGO_TARGET_DIR:-$dir/apart-core/target}/debug/apart-core" \
   RUST_LOG=info \
   APART_LSBLK_CMD="$dir/test/mocklsblk" \
   "$dir/src/app.py"

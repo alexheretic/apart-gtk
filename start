@@ -15,6 +15,6 @@ if [ -f ~/.config/apart-gtk/history.yaml ] && [ ! -f "$dir/history-backup-$now.y
 fi
 
 RUST_BACKTRACE=full \
-  APART_GTK_CORE_CMD="$dir/apart-core/target/debug/apart-core" \
+  APART_GTK_CORE_CMD="${CARGO_TARGET_DIR:-$dir/apart-core/target}/debug/apart-core" \
   RUST_LOG=info \
   "$dir/src/app.py"
