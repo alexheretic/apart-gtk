@@ -42,7 +42,7 @@ rm -rf apart-gtk/
 rm -rf /tmp/installdir
 
 echo "Downloading & verifying apart-gtk-v$APART_VERSION ..."
-curl -o apart.tar.gz -L https://github.com/alexheretic/apart-gtk/archive/v$APART_VERSION.tar.gz
+curl -o apart.tar.gz -L https://github.com/alexheretic/apart-gtk/archive/refs/tags/v$APART_VERSION.tar.gz
 echo "$APART_SHA256 apart.tar.gz" | sha256sum -c
 tar xf apart.tar.gz
 cd apart-gtk-$APART_VERSION
