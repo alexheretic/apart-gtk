@@ -22,6 +22,7 @@ If you have dependency issues, see the build sections for your distro. The GTK 3
 * polkit - for non-root usage
 * [apart-core](https://github.com/alexheretic/apart-core)
   * zeromq >= 4.1
+  * util-linux >= 2.28.2
   * partclone
   * pigz
   * lz4 *(optional: adds compression option)*
