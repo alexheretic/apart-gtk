@@ -64,7 +64,14 @@ class ApartCore(Thread):
             if os.geteuid() == 0 or os.environ.get('APART_PARTCLONE_CMD'):
                 self.process = subprocess.Popen([apart_core_cmd, self.ipc_address])
             else:
-                self.process = subprocess.Popen(['pkexec', apart_core_cmd, self.ipc_address])
+                pkexec_args = ['pkexec']
+                lsblk_override = os.environ.get('APART_LSBLK_CMD')
+                if lsblk_override:
+                    pkexec_args.append('env')
+                    pkexec_args.append('APART_LSBLK_CMD={}'.format(lsblk_override))
+                pkexec_args.extend([apart_core_cmd, self.ipc_address])
+
+                self.process = subprocess.Popen(pkexec_args)
         except FileNotFoundError:
             if os.geteuid() == 0:
                 print('apart-core command not found at \'' + apart_core_cmd + '\'', file=sys.stderr)
