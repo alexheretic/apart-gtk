@@ -1,16 +1,6 @@
 #!/usr/bin/env bash
 
 set -eu
-CARGO_CMD="rustup run stable cargo"
-while test $# -gt 0; do
-  case "$1" in
-    --cargo-cmd*)
-      CARGO_CMD=$(echo "$1" | sed -e 's/^[^=]*=//g')
-      shift
-      ;;
-  esac
-done
-
 APART_CORE_VERSION="0.3.15"
 APART_CORE_SHA256='a3ced019b1e7d1b07f3dd94d2827af53bcab7c97f5b6103be063a1d440b233ff'
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
@@ -25,7 +15,7 @@ curl -o core.tar.gz -L https://github.com/alexheretic/apart-core/archive/refs/ta
 sha256sum core.tar.gz
 echo "$APART_CORE_SHA256 core.tar.gz" | sha256sum -c
 tar xf core.tar.gz
-(cd apart-core-$APART_CORE_VERSION && $CARGO_CMD build --release)
+(cd apart-core-$APART_CORE_VERSION && cargo build --release)
 cp "${CARGO_TARGET_DIR:-"apart-core-$APART_CORE_VERSION/target"}/release/apart-core" lib/apart-gtk/
 strip lib/apart-gtk/apart-core
 rm core.tar.gz
