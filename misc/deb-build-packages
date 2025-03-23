@@ -27,6 +27,7 @@ fi
 apt update
 apt install -y ruby-dev build-essential git libzmq3-dev curl pkg-config python3 rpm
 if ! command -v fpm >/dev/null 2>&1; then
+  gem install dotenv -v 2.8.1
   gem install fpm
 fi
 
