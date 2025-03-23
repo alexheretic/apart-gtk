@@ -52,7 +52,7 @@ rpm -Uvh partclone-0.2.90-1.fc25.x86_64.rpm
 Follow build steps below.
 
 ## Build
-Run `./configure` then `make` having installed the above build dependencies
+Run `make` having installed the above build dependencies
 
 ## Manual Install
 After building run `make install` which copies the build made in ./target to /usr

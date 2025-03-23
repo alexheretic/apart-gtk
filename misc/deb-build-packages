@@ -48,7 +48,6 @@ echo "$APART_SHA256 apart.tar.gz" | sha256sum -c
 tar xf apart.tar.gz
 cd apart-gtk-$APART_VERSION
 
-./configure
 make
 mkdir -p /tmp/installdir
 make install DESTDIR=/tmp/installdir

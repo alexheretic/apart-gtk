@@ -1,9 +1,8 @@
 
 PREFIX = /usr
-build_dist_args?=
 
 all:
-	./build-dist $(build_dist_args)
+	./build-dist
 
 install: target
 	mkdir -p $(DESTDIR)$(PREFIX)
