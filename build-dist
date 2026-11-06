@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 
 set -eu
-APART_CORE_VERSION="0.3.16"
-APART_CORE_SHA256='1cd9d2e59f0a50d539a9d67f23dddfc41fd24c3945d5a4b8a39f9f74f19832ba'
+APART_CORE_VERSION="0.3.17"
+APART_CORE_SHA256='d8f25b064e0fe4eef8c2832eb277081974caf1f50cdc4085e7fdda654febfa0b'
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 cd "$DIR"

@@ -1,19 +1,24 @@
 #!/usr/bin/env bash
-
 ## Run on ubuntu container to build packages
+# shellcheck disable=SC1090
 
 set -eu
 APART_VERSION=""
+DEB_SUFFIX=""
 APART_SHA256=""
 while test $# -gt 0; do
   case "$1" in
     --version*)
-      APART_VERSION=`echo $1 | sed -e 's/^[^=]*=//g'`
+      APART_VERSION="${1#*=}"
       shift
       ;;
     --sha256*)
       # sha256sum of tar file, ie 0.11 had f19b7f34bf6f1e62e82fca54a202142a4ab100344f2e88920e3032abff4eaba8
-      APART_SHA256=`echo $1 | sed -e 's/^[^=]*=//g'`
+      APART_SHA256="${1#*=}"
+      shift
+      ;;
+    --deb-suffix*)
+      DEB_SUFFIX="${1#*=}"
       shift
       ;;
   esac
@@ -43,10 +48,10 @@ rm -rf apart-gtk/
 rm -rf /tmp/installdir
 
 echo "Downloading & verifying apart-gtk-v$APART_VERSION ..."
-curl -o apart.tar.gz -L https://github.com/alexheretic/apart-gtk/archive/refs/tags/v$APART_VERSION.tar.gz
+curl -o apart.tar.gz -L "https://github.com/alexheretic/apart-gtk/archive/refs/tags/v$APART_VERSION.tar.gz"
 echo "$APART_SHA256 apart.tar.gz" | sha256sum -c
 tar xf apart.tar.gz
-cd apart-gtk-$APART_VERSION
+cd "apart-gtk-$APART_VERSION"
 
 make
 mkdir -p /tmp/installdir
@@ -54,8 +59,8 @@ make install DESTDIR=/tmp/installdir
 
 cd /
 
-fpm -s dir -t deb -n apart-gtk -v $APART_VERSION -C /tmp/installdir \
- -p apart-gtk_VERSION_ARCH.deb \
+fpm -s dir -t deb -n apart-gtk -v "$APART_VERSION" -C /tmp/installdir \
+ -p "apart-gtk_VERSION${DEB_SUFFIX}_ARCH.deb" \
  -d policykit-1 \
  -d "partclone >= 0.2.89" \
  -d pigz \
@@ -71,7 +76,7 @@ fpm -s dir -t deb -n apart-gtk -v $APART_VERSION -C /tmp/installdir \
  --description "GUI for cloning & restoring disk partitions to & from compressed image files" \
  usr/bin usr/lib usr/share
 
-fpm -s dir -t rpm -n apart-gtk -v $APART_VERSION -C /tmp/installdir \
+fpm -s dir -t rpm -n apart-gtk -v "$APART_VERSION" -C /tmp/installdir \
  -p apart-gtk-VERSION-1.ARCH.rpm \
  -d polkit \
  -d "partclone >= 0.2.89" \

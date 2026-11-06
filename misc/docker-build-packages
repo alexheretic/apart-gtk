@@ -3,17 +3,18 @@
 set -eu
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 DOCKER_NAME="apart-pkg-build"
+DEBIAN_VERSION="trixie"
 APART_VERSION=""
 APART_SHA256=""
 while test $# -gt 0; do
   case "$1" in
     --version*)
-      APART_VERSION=`echo $1 | sed -e 's/^[^=]*=//g'`
+      APART_VERSION="${1#*=}"
       shift
       ;;
     --sha256*)
       # sha256sum of tar file, ie 0.11 had f19b7f34bf6f1e62e82fca54a202142a4ab100344f2e88920e3032abff4eaba8
-      APART_SHA256=`echo $1 | sed -e 's/^[^=]*=//g'`
+      APART_SHA256="${1#*=}"
       shift
       ;;
   esac
@@ -23,6 +24,7 @@ if [ -z "$APART_VERSION" ] || [ -z "$APART_SHA256" ]; then
   echo "Required arguments --version=VERSION --sha256=HASH"
   exit 1
 fi
+APART_DEB_V="$APART_VERSION-$DEBIAN_VERSION"
 
 if [[ $(systemctl status docker | grep -c 'Active: inactive') -gt 0 ]]; then
   echo "docker is currently inactive, must be started"
@@ -35,27 +37,30 @@ cd last-release
 
 if [[ "$(docker images)" != *"apart/pkg-builder"* ]]; then
   echo "Creating apart/pkg-builder image, and using to build packages"
-  docker run --name "$DOCKER_NAME-temp" -d ubuntu:18.04 tail -f /dev/null
+  docker run --name "$DOCKER_NAME-temp" -d "debian:$DEBIAN_VERSION" tail -f /dev/null
   docker cp "$DIR/deb-build-packages" "$DOCKER_NAME-temp":/
   docker cp "$DIR/clean-container" "$DOCKER_NAME-temp":/
-  docker exec -t "$DOCKER_NAME-temp" ./deb-build-packages --version=$APART_VERSION --sha256=$APART_SHA256
-  docker cp "$DOCKER_NAME-temp":/apart-gtk_${APART_VERSION}_amd64.deb ./
-  docker cp "$DOCKER_NAME-temp":/apart-gtk-${APART_VERSION}-1.x86_64.rpm ./
+  docker exec -t "$DOCKER_NAME-temp" ./deb-build-packages --version="$APART_VERSION" --sha256="$APART_SHA256" \
+    --deb-suffix="-$DEBIAN_VERSION"
+  docker cp "$DOCKER_NAME-temp:/apart-gtk_${APART_DEB_V}_amd64.deb" ./
+  docker cp "$DOCKER_NAME-temp:/apart-gtk-${APART_VERSION}-1.x86_64.rpm" ./
   docker exec -t "$DOCKER_NAME-temp" ./clean-container
   docker stop "$DOCKER_NAME-temp"
   docker export "$DOCKER_NAME-temp" | docker import - apart/pkg-builder
   docker rm $DOCKER_NAME-temp
 else
   echo "Using already created apart/pkg-builder image to build packages"
+  # shellcheck disable=SC2064
   trap "docker rm $DOCKER_NAME >/dev/null 2>&1" EXIT ERR
-  docker create --name $DOCKER_NAME -t apart/pkg-builder ./deb-build-packages --version=$APART_VERSION --sha256=$APART_SHA256
-  docker cp $DIR/deb-build-packages $DOCKER_NAME:/
+  docker create --name $DOCKER_NAME -t apart/pkg-builder ./deb-build-packages --version="$APART_VERSION" --sha256="$APART_SHA256" \
+    --deb-suffix="-$DEBIAN_VERSION"
+  docker cp "$DIR"/deb-build-packages $DOCKER_NAME:/
   docker start -a $DOCKER_NAME
-  docker cp $DOCKER_NAME:/apart-gtk_${APART_VERSION}_amd64.deb ./
-  docker cp $DOCKER_NAME:/apart-gtk-${APART_VERSION}-1.x86_64.rpm ./
+  docker cp "$DOCKER_NAME:/apart-gtk_${APART_DEB_V}_amd64.deb" ./
+  docker cp "$DOCKER_NAME:/apart-gtk-${APART_VERSION}-1.x86_64.rpm" ./
 fi
 
-gpg --armor --detach-sign apart-gtk_${APART_VERSION}_amd64.deb
-gpg --armor --detach-sign apart-gtk-${APART_VERSION}-1.x86_64.rpm
+gpg --armor --detach-sign "apart-gtk_${APART_DEB_V}_amd64.deb"
+gpg --armor --detach-sign "apart-gtk-${APART_VERSION}-1.x86_64.rpm"
 
 nautilus ./
