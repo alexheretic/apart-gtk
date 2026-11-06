@@ -61,11 +61,11 @@ cd /
 
 fpm -s dir -t deb -n apart-gtk -v "$APART_VERSION" -C /tmp/installdir \
  -p "apart-gtk_VERSION${DEB_SUFFIX}_ARCH.deb" \
- -d policykit-1 \
+ -d pkexec \
  -d "partclone >= 0.2.89" \
  -d pigz \
  -d zstd \
- -d liblz4-tool \
+ -d lz4 \
  -d "python3-humanize >= 0.5.1" \
  -d "python3-zmq >= 15.3.0" \
  -d "python3-yaml >= 3.11" \
